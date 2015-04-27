@@ -1,0 +1,419 @@
+#+TITLE: Base Facilities Initialization
+* Checks
+
+The version of the Emacs must not too old.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;; 1-sys.el -- Base Facilities Initialization
+  ;;
+  ;; this file do pre-checks and setup base facilities like packages managers
+  ;; and package auto-installation
+
+  (let ((minver "23.3"))
+    (when (version<= emacs-version "23.1")
+      (error "Your Emacs is too old -- this config requires v%s or higher" minver)))
+  (when (version<= emacs-version "24")
+    (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
+
+#+END_SRC
+
+* Startup time measurement
+
+Use this code to measure load time of a feature.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (defun sanityinc/time-subtract-millis (b a)
+    (* 1000.0 (float-time (time-subtract b a))))
+
+  (defvar sanityinc/require-times nil
+    "A list of (FEATURE . LOAD-DURATION).
+  LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
+
+  (defadvice require
+    (around build-require-times (feature &optional filename noerror) activate)
+    "Note in `sanityinc/require-times' the time taken to require each feature."
+    (let* ((already-loaded (memq feature features))
+           (require-start-time (and (not already-loaded) (current-time))))
+      (prog1
+          ad-do-it
+        (when (and (not already-loaded) (memq feature features))
+          (add-to-list 'sanityinc/require-times
+                       (cons feature
+                             (sanityinc/time-subtract-millis (current-time)
+                                                             require-start-time))
+                       t)))))
+
+#+END_SRC
+
+* Bootstrap
+
+** Compatibility issues
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;;;; Bootstrap
+
+  ;;----------------------------------------------------------------------------
+  ;; Provide a version of Emacs 24's 'string-prefix-p in older emacsen
+  ;;----------------------------------------------------------------------------
+  (when (eval-when-compile (< emacs-major-version 24))
+    (defun string-prefix-p (str1 str2 &optional ignore-case)
+      "Return non-nil if STR1 is a prefix of STR2.
+  If IGNORE-CASE is non-nil, the comparison is done without paying attention
+  to case differences."
+      (eq t (compare-strings str1 nil nil
+                             str2 0 (length str1) ignore-case))))
+
+#+END_SRC
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;----------------------------------------------------------------------------
+  ;; Allow recent packages to safely pass an arg to 'called-interactively-p
+  ;; in older Emacsen, including 23.1.
+  ;;----------------------------------------------------------------------------
+  (let ((fn (symbol-function 'called-interactively-p)))
+    (when (and (subrp fn) (zerop (cdr-safe (subr-arity fn))))
+      (message "Warning: overriding called-interactively-p to support an argument.")
+      (fset 'sanityinc/called-interactively-p fn)
+      (defun called-interactively-p (&optional kind)
+        "Overridden; see `sanityinc/called-interactively-p' for the wrapped function."
+        (sanityinc/called-interactively-p))))
+
+  (when (eval-when-compile (< emacs-major-version 24))
+    ;; Help package.el work in older Emacsen, where there's no TRASH arg
+    ;; for 'delete-directory
+    (message "Warning: overriding delete-directory to support TRASH argument.")
+    (fset 'sanityinc/delete-directory (symbol-function 'delete-directory))
+    (defun delete-directory (directory &optional recursive trash)
+      "Overridden: see `sanityinc/delete-directory' for the wrapped function"
+      (sanityinc/delete-directory directory recursive)))
+
+#+END_SRC
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;----------------------------------------------------------------------------
+  ;; Restore removed var alias, used by ruby-electric-brace and others
+  ;;----------------------------------------------------------------------------
+  (unless (boundp 'last-command-char)
+    (defvaralias 'last-command-char 'last-command-event))
+
+#+END_SRC
+
+** Util functions
+
+*NOTE*: use =add-auto-mode= to add new mode support.
+
+#+BEGIN_EXAMPLE
+(add-auto-mode 'R-mode "\\.R\\'")
+(add-auto-mode 'html-mode "\\.(jsp|tmpl)\\'")
+(add-auto-mode 'html-erb-mode "\\.rhtml\\'" "\\.html\\.erb\\'")
+#+END_EXAMPLE
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (if (fboundp 'with-eval-after-load)
+      (defalias 'after-load 'with-eval-after-load)
+    (defmacro after-load (feature &rest body)
+      "After FEATURE is loaded, evaluate BODY."
+      (declare (indent defun))
+      `(eval-after-load ,feature
+         '(progn ,@body))))
+
+
+  ;;----------------------------------------------------------------------------
+  ;; Handier way to add modes to auto-mode-alist
+  ;;----------------------------------------------------------------------------
+  ;; Yang: au PATTERNS setf MODE
+  (defun add-auto-mode (mode &rest patterns)
+    "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
+    (dolist (pattern patterns)
+      (add-to-list 'auto-mode-alist (cons pattern mode))))
+
+
+  ;;----------------------------------------------------------------------------
+  ;; String utilities missing from core emacs
+  ;;----------------------------------------------------------------------------
+  (defun sanityinc/string-all-matches (regex str &optional group)
+    "Find all matches for `REGEX' within `STR', returning the full match string or group `GROUP'."
+    (let ((result nil)
+          (pos 0)
+          (group (or group 0)))
+      (while (string-match regex str pos)
+        (push (match-string group str) result)
+        (setq pos (match-end group)))
+      result))
+
+  (defun sanityinc/string-rtrim (str)
+    "Remove trailing whitespace from `STR'."
+    (replace-regexp-in-string "[ \t\n]*$" "" str))
+
+
+  ;;----------------------------------------------------------------------------
+  ;; Find the directory containing a given library
+  ;;----------------------------------------------------------------------------
+  (autoload 'find-library-name "find-func")
+  (defun sanityinc/directory-of-library (library-name)
+    "Return the directory in which the `LIBRARY-NAME' load file is found."
+    (file-name-as-directory (file-name-directory (find-library-name library-name))))
+
+
+  ;;----------------------------------------------------------------------------
+  ;; Delete the current file
+  ;;----------------------------------------------------------------------------
+  (defun delete-this-file ()
+    "Delete the current file, and kill the buffer."
+    (interactive)
+    (or (buffer-file-name) (error "No file is currently being edited"))
+    (when (yes-or-no-p (format "Really delete '%s'?"
+                               (file-name-nondirectory buffer-file-name)))
+      (delete-file (buffer-file-name))
+      (kill-this-buffer)))
+
+
+  ;;----------------------------------------------------------------------------
+  ;; Rename the current file
+  ;;----------------------------------------------------------------------------
+  (defun rename-this-file-and-buffer (new-name)
+    "Renames both current buffer and file it's visiting to NEW-NAME."
+    (interactive "sNew name: ")
+    (let ((name (buffer-name))
+          (filename (buffer-file-name)))
+      (unless filename
+        (error "Buffer '%s' is not visiting a file!" name))
+      (if (get-buffer new-name)
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn
+          (when (file-exists-p filename)
+           (rename-file filename new-name 1))
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)))))
+
+  ;;----------------------------------------------------------------------------
+  ;; Browse current HTML file
+  ;;----------------------------------------------------------------------------
+  (defun browse-current-file ()
+    "Open the current file as a URL using `browse-url'."
+    (interactive)
+    (let ((file-name (buffer-file-name)))
+      (if (tramp-tramp-file-p file-name)
+          (error "Cannot open tramp file")
+        (browse-url (concat "file://" file-name)))))
+
+  ;;----------------------------------------------------------------------------
+  ;; Read from file to string
+  ;;----------------------------------------------------------------------------
+  (defun get-string-from-file (filePath)
+    "Return filePath's file content."
+    (with-temp-buffer
+      (insert-file-contents filePath)
+      (buffer-string)))
+  ;; thanks to “Pascal J Bourguignon” and “TheFlyingDutchman 〔zzbba…@aol.com〕”. 2010-09-02
+
+  (defun read-lines (filePath)
+    "Return a list of lines of a file at filePath."
+    (with-temp-buffer
+      (insert-file-contents filePath)
+      (split-string (buffer-string) "\n" t)))
+#+END_SRC
+
+** Packages management
+
+*** Site lisp
+Download site lisp into =~/.emacs.d/site-lisp/= then it will be auto loaded
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;; Set load path
+
+  (eval-when-compile (require 'cl))
+  (defun sanityinc/add-subdirs-to-load-path (parent-dir)
+    "Adds every non-hidden subdir of PARENT-DIR to `load-path'."
+    (let* ((default-directory parent-dir))
+      (progn
+        (setq load-path
+              (append
+               (remove-if-not
+                (lambda (dir) (file-directory-p dir))
+                (directory-files (expand-file-name parent-dir) t "^[^\\.]"))
+               load-path)))))
+
+  (sanityinc/add-subdirs-to-load-path
+   (expand-file-name "site-lisp/" user-emacs-directory))
+
+;;; Utilities for grabbing upstream libs
+
+  (defun site-lisp-dir-for (name)
+    (expand-file-name (format "site-lisp/%s" name) user-emacs-directory))
+
+  (defun site-lisp-library-el-path (name)
+    (expand-file-name (format "%s.el" name) (site-lisp-dir-for name)))
+
+  (defun download-site-lisp-module (name url)
+    (let ((dir (site-lisp-dir-for name)))
+      (message "Downloading %s from %s" name url)
+      (unless (file-directory-p dir)
+        (make-directory dir t))
+      (add-to-list 'load-path dir)
+      (let ((el-file (site-lisp-library-el-path name)))
+        (url-copy-file url el-file t nil)
+        el-file)))
+
+  (defun ensure-lib-from-url (name url)
+    (unless (site-lisp-library-loadable-p name)
+      (byte-compile-file (download-site-lisp-module name url))))
+
+  (defun site-lisp-library-loadable-p (name)
+    "Return whether or not the library `name' can be loaded from a
+  source file under ~/.emacs.d/site-lisp/name/"
+    (let ((f (locate-library (symbol-name name))))
+      (and f (string-prefix-p (file-name-as-directory (site-lisp-dir-for name)) f))))
+
+
+
+  ;; Download these upstream libs
+
+  (unless (> emacs-major-version 23)
+    (ensure-lib-from-url
+     'package
+     "http://repo.or.cz/w/emacs.git/blob_plain/ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09:/lisp/emacs-lisp/package.el"))
+
+#+END_SRC
+
+*** ELPA
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;; Find and load the correct package.el
+
+  ;; When switching between Emacs 23 and 24, we always use the bundled package.el in Emacs 24
+  (let ((package-el-site-lisp-dir
+         (expand-file-name "site-lisp/package" user-emacs-directory)))
+    (when (and (file-directory-p package-el-site-lisp-dir)
+               (> emacs-major-version 23))
+      (message "Removing local package.el from load-path to avoid shadowing bundled version")
+      (setq load-path (remove package-el-site-lisp-dir load-path))))
+
+  (require 'package)
+
+
+
+  ;;; Standard package repositories
+
+  ;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+
+  ;; We include the org repository for completeness, but don't normally
+  ;; use it.
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+
+  (when (< emacs-major-version 24)
+    (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+
+#+END_SRC
+
+Add more 3rd party repository here:
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;; Also use Melpa for most packages
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+  ;(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+  ;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+
+
+#+END_SRC
+
+Use =require-package= to auto install packages at the startup:
+#+BEGIN_EXAMPLE
+(require-package 'scratch)
+#+END_EXAMPLE
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; If gpg cannot be found, signature checking will fail, so we
+  ;; conditionally enable it according to whether gpg is available. We
+  ;; re-run this check once $PATH has been configured
+  (defun sanityinc/package-maybe-enable-signatures ()
+    (setq package-check-signature (when (executable-find "gpg") 'allow-unsigned)))
+
+  (sanityinc/package-maybe-enable-signatures)
+  (after-load 'init-exec-path
+    (sanityinc/package-maybe-enable-signatures))
+
+
+
+  ;;; On-demand installation of packages
+
+  (defun require-package (package &optional min-version no-refresh)
+    "Install given PACKAGE, optionally requiring MIN-VERSION.
+  If NO-REFRESH is non-nil, the available package lists will not be
+  re-downloaded in order to locate PACKAGE."
+    (if (package-installed-p package min-version)
+        t
+      (if (or (assoc package package-archive-contents) no-refresh)
+          (package-install package)
+        (progn
+          (package-refresh-contents)
+          (require-package package min-version t)))))
+
+
+  (defun maybe-require-package (package &optional min-version no-refresh)
+    "Try to install PACKAGE, and return non-nil if successful.
+  In the event of failure, return nil and print a warning message.
+  Optionally require MIN-VERSION.  If NO-REFRESH is non-nil, the
+  available package lists will not be re-downloaded in order to
+  locate PACKAGE."
+    (condition-case err
+        (require-package package min-version no-refresh)
+      (error
+       (message "Couldn't install package `%s': %S" package err)
+       nil)))
+
+
+  ;;; Fire up package.el
+
+  (setq package-enable-at-startup nil)
+  (package-initialize)
+
+
+
+  (require-package 'fullframe)
+  (fullframe list-packages quit-window)
+
+
+  (require-package 'cl-lib)
+  (require 'cl-lib)
+
+  (defun sanityinc/set-tabulated-list-column-width (col-name width)
+    "Set any column with name COL-NAME to the given WIDTH."
+    (cl-loop for column across tabulated-list-format
+             when (string= col-name (car column))
+             do (setf (elt column 1) width)))
+
+  (defun sanityinc/maybe-widen-package-menu-columns ()
+    "Widen some columns of the package menu table to avoid truncation."
+    (when (boundp 'tabulated-list-format)
+      (sanityinc/set-tabulated-list-column-width "Version" 13)
+      (let ((longest-archive-name (apply 'max (mapcar 'length (mapcar 'car package-archives)))))
+        (sanityinc/set-tabulated-list-column-width "Archive" longest-archive-name))))
+
+  (add-hook 'package-menu-mode-hook 'sanityinc/maybe-widen-package-menu-columns)
+
+#+END_SRC
+
+** Windows issues
+In order to set $PATH on Windows, use =exec-path-from-shell=
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'exec-path-from-shell)
+
+  (after-load 'exec-path-from-shell
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+      (add-to-list 'exec-path-from-shell-variables var)))
+
+
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize))
+
+#+END_SRC
