@@ -1,6 +1,6 @@
 #+TITLE: Yang's Emacs Configurations
 
-I use =[[http://orgmode.org/worg/org-contrib/babel/intro.html#literate-programming][Literate Programming]]= to mix up my configuration code and the
+I use [[http://orgmode.org/worg/org-contrib/babel/intro.html#literate-programming][Literate Programming]] to mix up my configuration code and the
 explanatory comments so that I can easily pick the meaning of a piece
 of code after a long time.
 
