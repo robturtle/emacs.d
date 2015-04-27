@@ -1,0 +1,125 @@
+#+TITLE: Yang's Emacs Configurations
+
+I use =[[http://orgmode.org/worg/org-contrib/babel/intro.html#literate-programming][Literate Programming]]= to mix up my configuration code and the
+explanatory comments so that I can easily pick the meaning of a piece
+of code after a long time.
+
+The most of the code base comes from [[https://github.com/purcell/emacs.d][Steve Purcell's emacs.d]] and what
+I'm gonna do is to translate them in a literate programming
+way. (P.S. It was refered in [[https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/guide-zh.org][Mastering Emacs in One Year Guide]])
+
+The init.el is learnt from [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua's config]] and the official [[http://orgmode.org/worg/org-contrib/babel/intro.html#literate-programming][babel
+guide]]. With this I can auto load my org file into initialization
+progress.
+
+The Org-mode config comes from [[http://doc.norang.ca/org-mode.html][here]].
+
+The current progress of translating Steve Purcell's config is:
+
+*** NEXT [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [1/9] 		:ORG:
+    :LOGBOOK:
+    CLOCK: [2015-04-27 Mon 16:02]--[2015-04-27 Mon 16:04] =>  0:02
+    CLOCK: [2015-04-27 Mon 14:55]--[2015-04-27 Mon 15:54] =>  0:59
+    CLOCK: [2015-04-27 Mon 14:49]--[2015-04-27 Mon 14:53] =>  0:04
+    CLOCK: [2015-04-27 Mon 14:37]--[2015-04-27 Mon 14:46] =>  0:09
+    CLOCK: [2015-04-27 Mon 14:01]--[2015-04-27 Mon 14:02] =>  0:01
+    :END:
+  [2015-04-27 Mon 14:01]
+  - [X] personal info
+**** DONE Bootstrap config [4/4]
+     :LOGBOOK:
+     CLOCK: [2015-04-27 Mon 16:04]--[2015-04-27 Mon 16:47] =>  0:43
+     :END:
+     - [X] compatibility issues - compat
+     - [X] helper functions - utils
+     - [X] package manager - elpa
+     - [X] set up $PATH; for Windows Emacs - exec-path
+**** NEXT base packages [0/5]
+     - [ ] write grep command in a buffer - wgrep
+     - [ ] allow u to autoload file .emacs-project[-MODE] - project-local-variable
+     - [ ] minor mode with no modeline display - dimnish
+     - [ ] mode-specific scratch buffers - scratch
+     - [ ] log keyboard commands to buffer - mwe-log-commands
+**** TODO Load config for specific features & modes [0/28]
+     - [ ] frame-hooks
+     - [ ] xtrem
+     - [ ] *themes*
+     - [ ] osx-keys - obsolete
+     - [ ] gui-frames
+     - [ ] fonts
+     - [ ] evil --- should I install it?
+       - [ ] FIXME: powerline
+       - [ ] use c-p c-n in insert mode
+     - [ ] *helm*
+       - [ ] FIXME: org tags
+     - [ ] relative-line-numbers - obsolete - mode specific
+     - [ ] proxies - obsolete
+     - [ ] dired
+     - [ ] speedbar
+     - [ ] isearch
+     - [ ] grep
+     - [ ] uniquify
+     - [ ] ibuffer
+     - [ ] *flycheck*
+     - [ ] recentf
+     - [ ] ido
+     - [ ] mmm
+     - [ ] crontab
+     - [ ] spelling
+     - [ ] *misc*
+     - [ ] ledger - obsolete
+     - [ ] gnuplot - obsolete
+     - [ ] osx-location
+     - [ ] regex-tool
+     - [ ] server
+**** TODO Text edit [0/5]
+     - [ ] hippie-expand
+     - [ ] editing-utils
+     - [ ] *company*
+     - [ ] *yasnippet*
+     - [ ] *doxymacs*
+**** TODO Navigation & Projects Management [0/8]
+     - [ ] *projectile*
+     - [ ] windows - should I install? - obsolete
+     - [ ] sessions - should I install?
+     - [ ] *bookmark*
+     - [ ] vc - obsolete
+     - [ ] darcs - obsolete
+     - [ ] *git*
+     - [ ] *github*
+**** TODO Sematics & Language Support [0/17]
+     - [ ] semantic - should I install?
+     - [ ] compile
+     - [ ] cc
+     - [ ] textile
+     - [ ] markdown
+     - [ ] csv
+     - [ ] erlang
+     - [ ] python - remember ipython notebooks
+     - [ ] haskell
+     - [ ] ruby
+     - [ ] rails
+     - [ ] R
+     - [ ] paredit
+     - [ ] lisp
+     - [ ] slime
+     - [ ] clojure
+     - [ ] lua
+**** TODO Front-end languages [0/11]
+     - [ ] javascript
+     - [ ] php
+     - [ ] org
+     - [ ] latex
+     - [ ] nxml
+     - [ ] html
+     - [ ] htmlize
+     - [ ] css
+     - [ ] haml
+     - [ ] sql
+     - [ ] dsvn
+**** TODO Documentation [0/1]
+     - [ ] dash
+**** TODO Misc [0/3]
+     - [ ] variables configured via the interactive 'customize' interface
+     - [ ] allow users to provide optional 'init-local' containting personal settings
+     - [ ] locales (setting them earlier in this file doesn't work in X)
