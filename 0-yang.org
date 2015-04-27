@@ -1,0 +1,6 @@
+* Personal information
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Yang Liu"
+        user-mail-address "yl3710@nyu.edu")
+#+END_SRC
