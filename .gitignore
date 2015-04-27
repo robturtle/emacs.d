@@ -1,0 +1,7 @@
+*.el
+!init.el
+.org-id-locations
+auto-save-list/
+elpa/
+ido.last
+bookmarks
