@@ -1,4 +1,8 @@
 #+TITLE: Base Facilities Initialization
+
+Note the order of this file may not be changed because the further
+commands may require the eariler configurations.
+
 * Checks
 
 The version of the Emacs must not too old.
@@ -18,8 +22,15 @@ The version of the Emacs must not too old.
 
 #+END_SRC
 
-* Startup time measurement
+Tell whether this machine is a mac
 
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+(defconst *is-a-mac* (eq system-type 'darwin))
+
+#+END_SRC
+
+* Startup time measurement
 Use this code to measure load time of a feature.
 
 #+header: :tangle yes
@@ -48,7 +59,6 @@ Use this code to measure load time of a feature.
 #+END_SRC
 
 * Bootstrap
-
 ** Compatibility issues
 
 #+header: :tangle yes
@@ -417,3 +427,619 @@ In order to set $PATH on Windows, use =exec-path-from-shell=
     (exec-path-from-shell-initialize))
 
 #+END_SRC
+
+* Util Packages
+** Mode-specific scratch
+
+Usage: =M-x scratch= to open a scratch buffer for *current* major mode.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+(require-package 'scratch)
+#+END_SRC
+* Appearance
+** Color theme
+
+Switches: =M-x dark= and =M-x light=
+
+NOTE: at the first time you've installed the color theme, use at least
+once =M-x dark= to mark both light and dark color theme as safe.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+(when (< emacs-major-version 24)
+  (require-package 'color-theme))
+
+(require-package 'color-theme-sanityinc-solarized)
+(require-package 'color-theme-sanityinc-tomorrow)
+
+;;------------------------------------------------------------------------------
+;; Old-style color theming support (via color-theme.el)
+;;------------------------------------------------------------------------------
+(defcustom window-system-color-theme 'color-theme-sanityinc-solarized-dark
+  "Color theme to use in window-system frames.
+If Emacs' native theme support is available, this setting is
+ignored: use `custom-enabled-themes' instead."
+  :type 'symbol)
+
+(defcustom tty-color-theme 'color-theme-terminal
+  "Color theme to use in TTY frames.
+If Emacs' native theme support is available, this setting is
+ignored: use `custom-enabled-themes' instead."
+  :type 'symbol)
+
+(unless (boundp 'custom-enabled-themes)
+  (defun color-theme-terminal ()
+    (interactive)
+    (color-theme-sanityinc-solarized-dark))
+
+  (defun apply-best-color-theme-for-frame-type (frame)
+    (with-selected-frame frame
+      (funcall (if window-system
+                   window-system-color-theme
+                 tty-color-theme))))
+
+  (defun reapply-color-themes ()
+    (interactive)
+    (mapcar 'apply-best-color-theme-for-frame-type (frame-list)))
+
+  (set-variable 'color-theme-is-global nil)
+  (add-hook 'after-make-frame-functions 'apply-best-color-theme-for-frame-type)
+  (add-hook 'after-init-hook 'reapply-color-themes)
+  (apply-best-color-theme-for-frame-type (selected-frame)))
+
+
+;;------------------------------------------------------------------------------
+;; New-style theme support, in which per-frame theming is not possible
+;;------------------------------------------------------------------------------
+
+;; If you don't customize it, this is the theme you get.
+(setq-default custom-enabled-themes '(sanityinc-solarized-light))
+
+;; Ensure that themes will be applied even if they have not been customized
+(defun reapply-themes ()
+  "Forcibly load the themes listed in `custom-enabled-themes'."
+  (dolist (theme custom-enabled-themes)
+    (unless (custom-theme-p theme)
+      (load-theme theme)))
+  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes))))
+
+(add-hook 'after-init-hook 'reapply-themes)
+
+
+;;------------------------------------------------------------------------------
+;; Toggle between light and dark
+;;------------------------------------------------------------------------------
+(defun light ()
+  "Activate a light color theme."
+  (interactive)
+  (color-theme-sanityinc-solarized-light))
+
+(defun dark ()
+  "Activate a dark color theme."
+  (interactive)
+  (color-theme-sanityinc-solarized-dark))
+
+#+END_SRC
+
+** GUI features
+
+Most of the GUI features are supressed.  And add shorcuts to adjust
+fullscreen or opacity.
+
+| Key   | Function                    |
+|-------+-----------------------------|
+| M-s-f | toggle full screen          |
+| M-C-8 | make emacs more transparent |
+| M-C-9 | make emacs less transparent |
+| M-C-0 | make emacs not  transparent |
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;;----------------------------------------------------------------------------
+;; Stop C-z from minimizing windows under OS X
+;;----------------------------------------------------------------------------
+;;;; Yang: I need the suspend shortcut
+;; (defun maybe-suspend-frame ()
+;;   (interactive)
+;;   (unless (and *is-a-mac* window-system)
+;;     (suspend-frame)))
+
+;; (global-set-key (kbd "C-z") 'maybe-suspend-frame)
+
+
+;;----------------------------------------------------------------------------
+;; Suppress GUI features
+;;----------------------------------------------------------------------------
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+
+
+;;----------------------------------------------------------------------------
+;; Show a marker in the left fringe for lines not in the buffer
+;;----------------------------------------------------------------------------
+(setq indicate-empty-lines t) ; indicate TRAILING empty lines
+
+
+;;----------------------------------------------------------------------------
+;; Window size and features
+;;----------------------------------------------------------------------------
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'set-scroll-bar-mode)
+  (set-scroll-bar-mode nil))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+
+(let ((no-border '(internal-border-width . 0)))
+  (add-to-list 'default-frame-alist no-border)
+  (add-to-list 'initial-frame-alist no-border))
+
+(defun sanityinc/adjust-opacity (frame incr)
+  (let* ((oldalpha (or (frame-parameter frame 'alpha) 100))
+         (newalpha (+ incr oldalpha)))
+    (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
+      (modify-frame-parameters frame (list (cons 'alpha newalpha))))))
+
+ (when (and *is-a-mac* (fboundp 'toggle-frame-fullscreen))
+   ;; Command-Option-f to toggle fullscreen mode
+   ;; Hint: Customize `ns-use-native-fullscreen'
+   (global-set-key (kbd "M-s-f") 'toggle-frame-fullscreen))
+
+ (global-set-key (kbd "M-C-8") (lambda () (interactive) (sanityinc/adjust-opacity nil -2)))
+ (global-set-key (kbd "M-C-9") (lambda () (interactive) (sanityinc/adjust-opacity nil 2)))
+ (global-set-key (kbd "M-C-0") (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
+
+
+;;;; I just totally shut down the menu-bar-mode
+;; (add-hook 'after-make-frame-functions
+;;           (lambda (frame)
+;;             (with-selected-frame frame
+;;               (unless window-system
+;;                 (set-frame-parameter nil 'menu-bar-lines 0)))))
+
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
+
+;; Non-zero values for `line-spacing' can mess up ansi-term and co,
+;; so we zero it explicitly in those cases.
+(add-hook 'term-mode-hook
+          (lambda ()
+            (setq line-spacing 0)))
+
+#+END_SRC
+
+* Re-enter with Environment Saved
+
+I hate to adjust my Emacs's size and opacity again and again after
+restart.  So it's important to save all session environment.
+
+Purcell uses a built-in mode =desktop-save-mode=.  You can manually
+call its functions using =M-x desktop-save= and =M-x desktop-read=.
+Note that this function is /directory/ specified.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+    ;; save a list of open files in ~/.emacs.d/.emacs.desktop
+    (setq desktop-path (list user-emacs-directory)
+          desktop-auto-save-timeout 600)
+    (desktop-save-mode 1)
+
+    (defadvice desktop-read (around time-restore activate)
+        (let ((start-time (current-time)))
+          (prog1
+              ad-do-it
+            (message "Desktop restored in %.2fms"
+                     (sanityinc/time-subtract-millis (current-time)
+                                                     start-time)))))
+
+    (defadvice desktop-create-buffer (around time-create activate)
+      (let ((start-time (current-time))
+            (filename (ad-get-arg 1)))
+        (prog1
+            ad-do-it
+          (message "Desktop: %.2fms to restore %s"
+                   (sanityinc/time-subtract-millis (current-time)
+                                                   start-time)
+                   (when filename
+                     (abbreviate-file-name filename))))))
+
+    ;;----------------------------------------------------------------------------
+    ;; Restore histories and registers after saving
+    ;;----------------------------------------------------------------------------
+    (setq-default history-length 1000)
+    (savehist-mode t)
+
+    (require-package 'session)
+
+    (setq session-save-file (expand-file-name ".session" user-emacs-directory))
+    (add-hook 'after-init-hook 'session-initialize)
+
+    ;; save a bunch of variables to the desktop file
+    ;; for lists specify the len of the maximal saved data also
+    (setq desktop-globals-to-save
+          (append '((comint-input-ring        . 50)
+                    (compile-history          . 30)
+                    desktop-missing-file-warning
+                    (dired-regexp-history     . 20)
+                    (extended-command-history . 30)
+                    (face-name-history        . 20)
+                    (file-name-history        . 100)
+                    (grep-find-history        . 30)
+                    (grep-history             . 30)
+  ;                  (ido-buffer-history       . 100)
+  ;                  (ido-last-directory-list  . 100)
+  ;                  (ido-work-directory-list  . 100)
+  ;                  (ido-work-file-list       . 100)
+                    (magit-read-rev-history   . 50)
+                    (minibuffer-history       . 50)
+                    (org-clock-history        . 50)
+                    (org-refile-history       . 50)
+                    (org-tags-history         . 50)
+                    (query-replace-history    . 60)
+                    (read-expression-history  . 60)
+                    (regexp-history           . 60)
+                    (regexp-search-ring       . 20)
+                    register-alist
+                    (search-ring              . 20)
+                    (shell-command-history    . 50)
+                    tags-file-name
+                    tags-table-list)))
+
+    (when (eval-when-compile (and (>= emacs-major-version 24)
+                                  (version< emacs-version "24.3.50")
+                                  ))
+      (unless (boundp 'desktop-restore-frames)
+        (require-package 'frame-restore)
+        (frame-restore)))
+#+END_SRC
+
+* Navigation
+** [[http://tuhdo.github.io/helm-intro.html][Helm]]
+=Helm= is a much more visualized navigation than =ido=.  It contains
+many functions and site-packages.  First of all, the base package is
+necessary.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;; helm
+(require-package 'helm)
+(require 'helm-config)
+#+END_SRC
+
+*** Setup
+
+=helm= will play as my default navigation system everywhere in the
+Emacs.
+
+Starts helm.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (helm-mode 1)
+
+#+END_SRC
+
+Config about helm's behaviors.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages) ; So I can get man under cursor
+
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t)
+#+END_SRC
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (helm-autoresize-mode 1) ; make helm buffer auto adjust its size according to its contents
+  ;; fuzzy match is great
+  (setq helm-recentf-fuzzy-match          t
+        helm-buffers-fuzzy-matching       t
+        helm-M-x-fuzzy-match              t
+  ;     helm-locate-fuzzy-match           t ; don't set it because it only works on Linux
+        helm-semantic-fuzzy-match         t
+        helm-imenu-fuzzy-match            t
+        helm-apropos-fuzzy-match          t
+        helm-lisp-fuzzy-completion        t)
+#+END_SRC
+
+Set up helm global key:
+
+| Key     | Function                       |
+|---------+--------------------------------|
+| C-c h   | helm prefix                    |
+| M-x     | helm-M-x                       |
+| C-x C-f | show file system               |
+| C-c M   | search man manual at the point |
+| C-x b   | show buffers                   |
+| M-y     | show kill ring                 |
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+  ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+  ;; cannot cahnge `helm-command-prefix-key' once `helm-config' is loaded
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
+
+  ;; replace the default functions on Emacs
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x b") 'helm-mini)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+  ;; swap the functio of `TAB' and `C-z'
+  ;; Now `TAB' will not quit the helm session after the action ran
+  ;; while `C-z' does
+  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+#+END_SRC
+
+*** Basic Usage
+Browsing:
+    - type one or more words for search, keywords are separated by =SPC=
+    - expand path name with =C-j=, go to parent directory with =C-l=
+    - mark a candidate with =C-SPC=
+    - insert candidate into buffer with =C-c C-i=
+    - toggle horizontal/vertical layout =C-t=
+    - open in other window =C-c o=
+    
+      
+*NOTE* that never use =TAB= to complete path again.
+
+Commands:
+    - use =TAB= to run persistent action on marked candidates.  It will not quit
+      the helm session.  Normally it's used to preview the file.
+    - use =C-z= to run action on marked candidates.  It will quit the
+      helm session.
+
+**** M-x
+     - =TAB= will display the document on other window
+
+**** helm-show-kill-ring =M-y=
+I can interactive select my kill ring now!  Replace this with the
+default Emacs kill ring.
+
+**** helm-mini =C-x b=
+     - filter by major mode wieh =*= and =*!=.  For example: =*java=, =*!dired=
+       - multiple filters separated by ',', e.g. =*!lisp,!sh,!fun=
+     - filter by folder with =/= and =!/=.  For example =/emacs.d/=, =!/.git/=
+     - filter by contents with =@=
+       - if you want to see the location of the strings. use =M-a C-s=
+         to search
+       - if you want to search in one file without canceling
+         candidates' marks, use =C-u C-s=
+       - =C-u C-s= is also used to search recursively
+       
+**** helm-semantic-or-imenu - Outline View =i=
+
+If =semantic-mode= is enabled, use =semantic= to generate tags,
+otherwise =imenu=. When doing it on a C/C++ file, and your cursor on a
+header file, persistent action (i.e. =TAB= in my setting) will preview
+that file on other window.
+
+Filter the tags (e.g. functions, variables), enter =^f= for functions.
+
+**** helm-find =/=
+
+If you search on a huge directory and feel the update is slow, use
+=C-!= to close the live updating feature.
+
+     - toggle candidates to =helm-find-file= by =RET=
+     - you can use =helm-find= in =helm-find-file= by =C-c /=
+
+
+The issue is I seems can't change the searching directory in file
+buffers.  I can only sucessfully change the directory in a dired
+buffer.  And it cannot find the backup file like =example.txt~=.
+
+**** helm-locate =l=
+
+It should be much faster than =helm-find=.  And it accepts search
+patterns.  I should use this more often.
+
+**** helm-occur =o=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; fasten some helm invoking
+  (global-set-key (kbd "C-c h o") 'helm-occur)
+
+#+END_SRC
+
+It's better than the default =I-search= function on Emacs.  I can use
+this instead of =I-search= in most cases.
+
+**** helm-apropos =a=
+
+Pre-configured helm to describe /commands, functions, variables and
+faces/ - all in one command!  A good way to search elisp documentaion.
+
+**** helm-info =h=
+
+| Key | Binding            |
+|-----+--------------------|
+| h g | helm-info-gnus     |
+| h i | helm-info-at-point |
+| h r | helm-info-emacs    | 
+
+**** helm-lisp-completion-at-point =TAB=  
+
+It will popup a list for you to select.  A good way to explore the
+API.
+
+**** helm-resume =b=
+
+A very useful command!
+
+**** helm-all-mark-ring =C-h SPC=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
+#+END_SRC
+
+**** helm-regexp =r=
+
+A useful command to test regexp interactively.  Following actions are
+available if =C-z=:
+
+| Key | Action                                                    |
+|-----+-----------------------------------------------------------|
+| F1  | Saves the regexp as a string in =kill-ring=               |
+| F2  | Invoke =query-replace= with current regexp to be replaced |
+| F3  | Saves the regexp as in the current Helm prompt            |
+
+**** helm-register =x=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h x") 'helm-register)
+#+END_SRC
+
+Viewing Emacs registers.
+
+| Key | Action                                                               |
+|-----+----------------------------------------------------------------------|
+| F1  | Insert register content into buffer                                  |
+| F2  | Append an active region to current content in highlighting register  |
+| F3  | Prepend an active region to current content in highlighting register |
+
+**** helm-top =t=
+
+| Key     | Binding                |
+|---------+------------------------|
+| F1      | KILL - SIGTERM         |
+| F2      | KILL - SIGKILL         |
+| F3      | KILL - SIGINT          |
+| F4      | KILL - Chose signal    |
+| C-c C-u | Refresh                |
+| M-C     | Sort by shell commands |
+| M-P     | Sort by CPU usage      |
+| M-U     | Sort by user           |
+| M-M     | Sort by memory         | 
+
+**** helm-surfraw - internet search =s=  
+
+Before I can use this function, I have to solve the GFW problem
+first.  And the command line program =surfraw= must be installed.
+
+**** helm-google-suggest =g=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h g") 'helm-google-suggest)
+#+END_SRC
+
+I have to deal with the GFW problem before using it.
+
+**** helm-color =c=
+
+If you want to quickly view and copy hexadecimal values of colors,
+helm-color provides such features. But, helm-color is beyond a mere
+color picker. The real usage for helm-color is for face customization:
+the command list ALL available faces, with a preview of each face in
+the same row. This makes theme customization really quick because you
+can quickly view a face with its color. Because the way Helm work, you
+can look at a group of faces together to have a global view if the
+colors work well with each other.
+
+helm-color contains two groups, with actions in each:
+
+Colors:
+| Key        | Action      |
+|------------+-------------|
+| F1 / C-c N | Copy Name   |
+| F2 / C-c R | Copy RGB    |
+| F3 / C-c n | Insert name |
+| F4 / C-c r | Insert RGB  | 
+
+Customize face:
+| Key | Action                    |
+|-----+---------------------------|
+| F1  | Open Customization window |
+| F2  | Copy face name            |
+
+**** helm-eval-expression-with-eldoc =M-:=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h M-:") 'helm-eval-expression-with-eldoc)
+#+END_SRC
+
+This command allows you to enter Emacs Lisp expressions and get
+instant result in a Helm buffer for every character you type. The
+changed key binding above makes it easier to remember, since the stock
+eval-expression binds to M-:. So, from now on, to eval expression
+without live update, use M-:, and with live update, use C-c h
+M-:. This command is useful when you want to try out a command with
+various inputs, and want to see result as fast as possible.
+
+**** helm-calcul-expression =C-comma=
+A handful calculator.
+*** [[http://tuhdo.github.io/helm-intro.html#sec-28][helm-eshell-history]] =C-c C-l=
+*** [[http://tuhdo.github.io/helm-projectile.html][Helm Projectile]]
+**** [[http://tuhdo.github.io/helm-intro.html#sec-31][Setup]]
+*** helm-descbinds
+**** [[http://tuhdo.github.io/helm-intro.html#sec-32][Setup]]
+*** helm-gtags
+=helm-gtags= is a helm interface for =GNU Global=.  The author
+recommanded the following configuration:
+
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+  ;; Enable helm-gtags-mode
+      (add-hook 'c-mode-hook 'helm-gtags-mode)
+      (add-hook 'c++-mode-hook 'helm-gtags-mode)
+      (add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+      ;; Set key bindings
+      (eval-after-load "helm-gtags"
+        '(progn
+           (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-find-tag)
+           (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
+           (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
+           (define-key helm-gtags-mode-map (kbd "M-g M-p") 'helm-gtags-parse-file)
+           (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+           (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+           (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)))
+#+END_SRC
+
+Purcell used the following configuration:
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-use-input-at-cursor t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-prefix-key "\C-cg"
+ helm-gtags-suggested-key-mapping t
+ )
+(require-package 'helm-gtags)
+(require 'helm-gtags)
+;; Enable helm-gtags-mode
+(add-hook 'dired-mode-hook 'helm-gtags-mode)
+(add-hook 'eshell-mode-hook 'helm-gtags-mode)
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
+(eval-after-load "helm-tags"
+  '(progn
+    (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+    (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+    (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+    (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+    (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+    (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)))
+
+#+END_SRC
+
