@@ -14,9 +14,21 @@ progress.
 
 The Org-mode config comes from [[http://doc.norang.ca/org-mode.html][here]].
 
+I use the digit number to indicate the execute order the all the org
+files.  Currently there are 3 levels:
+
+  - =0-xxx.org=: personal variables setting
+  - =1-sys.org=: all the universal package configs
+  - =2-xyz.org=: settings for major mode =xyz=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;; placeholder for init.el tangle handler
+#+END_SRC
+
 The current progress of translating Steve Purcell's config is:
 
-*** NEXT [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [1/9] 		:ORG:
+*** NEXT [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [2/10]		:ORG:
     :LOGBOOK:
     CLOCK: [2015-04-27 Mon 16:02]--[2015-04-27 Mon 16:04] =>  0:02
     CLOCK: [2015-04-27 Mon 14:55]--[2015-04-27 Mon 15:54] =>  0:59
@@ -34,24 +46,31 @@ The current progress of translating Steve Purcell's config is:
      - [X] helper functions - utils
      - [X] package manager - elpa
      - [X] set up $PATH; for Windows Emacs - exec-path
-**** NEXT base packages [0/5]
+**** HOLD base packages [1/4]					       :HOLD:
+     - State "HOLD"       from "NEXT"       [2015-04-28 Tue 21:14] \\
+       Some of these packages I don't think I ll use them currently.
+       So I ll just leave it.
+     :LOGBOOK:
+     CLOCK: [2015-04-28 Tue 21:10]--[2015-04-28 Tue 21:15] =>  0:05
+     :END:
      - [ ] write grep command in a buffer - wgrep
-     - [ ] allow u to autoload file .emacs-project[-MODE] - project-local-variable
      - [ ] minor mode with no modeline display - dimnish
-     - [ ] mode-specific scratch buffers - scratch
+     - [X] mode-specific scratch buffers - scratch
      - [ ] log keyboard commands to buffer - mwe-log-commands
-**** TODO Load config for specific features & modes [0/28]
-     - [ ] frame-hooks
-     - [ ] xtrem
-     - [ ] *themes*
-     - [ ] osx-keys - obsolete
-     - [ ] gui-frames
+**** NEXT Load config for specific features & modes [2/25]
+     :LOGBOOK:
+     CLOCK: [2015-04-28 Tue 21:40]--[2015-04-28 Tue 22:24] =>  0:44
+     CLOCK: [2015-04-28 Tue 21:16]--[2015-04-28 Tue 21:28] =>  0:12
+     :END:
+     - [ ] frame-hooks - a hook runs after a newly created frame
+     - xtrem - I don't use xterm now
+     - [X] *themes*
+     - osx-keys - I've set the key binding system wide, so no need for this
+     - [X] gui-frames
      - [ ] fonts
      - [ ] evil --- should I install it?
        - [ ] FIXME: powerline
        - [ ] use c-p c-n in insert mode
-     - [ ] *helm*
-       - [ ] FIXME: org tags
      - [ ] relative-line-numbers - obsolete - mode specific
      - [ ] proxies - obsolete
      - [ ] dired
@@ -78,10 +97,29 @@ The current progress of translating Steve Purcell's config is:
      - [ ] *company*
      - [ ] *yasnippet*
      - [ ] *doxymacs*
-**** TODO Navigation & Projects Management [0/8]
+**** NEXT Navigation & Projects Management - Projectile now [2/10]
+     SCHEDULED: <2015-04-30 Thu 09:00>
+     :LOGBOOK:
+     CLOCK: [2015-04-29 Wed 21:23]--[2015-04-29 Wed 22:00] =>  0:37
+     CLOCK: [2015-04-29 Wed 20:50]--[2015-04-29 Wed 21:22] =>  0:32
+     CLOCK: [2015-04-29 Wed 18:32]--[2015-04-29 Wed 20:02] =>  1:30
+     CLOCK: [2015-04-29 Wed 14:57]--[2015-04-29 Wed 16:11] =>  1:14
+     CLOCK: [2015-04-29 Wed 14:54]--[2015-04-29 Wed 14:57] =>  0:03
+     CLOCK: [2015-04-29 Wed 11:52]--[2015-04-29 Wed 12:13] =>  0:21
+     CLOCK: [2015-04-29 Wed 11:00]--[2015-04-29 Wed 11:51] =>  0:51
+     CLOCK: [2015-04-28 Tue 22:55]--[2015-04-28 Tue 23:34] =>  0:39
+     CLOCK: [2015-04-28 Tue 22:24]--[2015-04-28 Tue 22:34] =>  0:10
+     :END:
+
+     - [-] *helm*
+       - [X] FIXME: helm org tags
+       - [ ] eshell-history
+       - [ ] *helm-projectile*
+       - [ ] descbinds
+       - [ ] helm-gtags
      - [ ] *projectile*
      - [ ] windows - should I install? - obsolete
-     - [ ] sessions - should I install?
+     - [X] sessions - should I install?
      - [ ] *bookmark*
      - [ ] vc - obsolete
      - [ ] darcs - obsolete
@@ -119,7 +157,29 @@ The current progress of translating Steve Purcell's config is:
      - [ ] dsvn
 **** TODO Documentation [0/1]
      - [ ] dash
-**** TODO Misc [0/3]
+**** NEXT Misc [0/3]
+     :LOGBOOK:
+     CLOCK: [2015-04-29 Wed 11:07]--[2015-04-29 Wed 11:08] =>  0:01
+     CLOCK: [2015-04-29 Wed 10:42]--[2015-04-29 Wed 10:45] =>  0:03
+     :END:
      - [ ] variables configured via the interactive 'customize' interface
      - [ ] allow users to provide optional 'init-local' containting personal settings
      - [ ] locales (setting them earlier in this file doesn't work in X)
+**** DONE IDO or helm?
+      :PROPERTIES:
+      :Effort:   2:00
+      :END:
+      :LOGBOOK:
+      CLOCK: [2015-04-29 Wed 10:34]--[2015-04-29 Wed 10:42] =>  0:08
+      :END:
+    [2015-04-29 Wed 01:01]
+**** NEXT [[file:~/.emacs.d][git push .emacs.d]]						:Git:
+     SCHEDULED: <2015-04-29 .+3d/7d>
+     :PROPERTIES:
+     :STYLE:    habit
+     :REPEAT_TO_STATE: NEXT
+     :END:
+     :LOGBOOK:
+     CLOCK: [2015-04-29 Wed 23:26]
+     :END:
+   [2015-04-29 Wed 23:21]
