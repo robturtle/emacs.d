@@ -830,6 +830,8 @@ To refile tasks in org you need to tell it where you want to refile things.
 In my setup I let any file in =org-agenda-files= and the current file
 contribute to the list of valid refile targets.  
 
+#+BEGIN_SRC org :exports none
+;; no need to use ido
 I've recently moved to using IDO to complete targets directly.  I find
 this to be faster than my previous complete in steps setup.  At first
 I didn't like IDO but after reviewing the documentation again and
@@ -843,6 +845,7 @@ completion as the final target.  I like this a lot.  I show full
 outline paths in the targets so I can have the same heading in
 multiple subtrees or projects and still tell them apart while
 refiling.
+#+END_SRC
 
 I now exclude =DONE= state tasks as valid refile targets.  This helps to keep the
 refile target list to a reasonable size.
@@ -854,25 +857,13 @@ Here is my refile configuration:
 (setq org-refile-targets (quote ((nil :maxlevel . 9)
                                  (org-agenda-files :maxlevel . 9))))
 
-; Use full outline paths for refile targets - we file directly with IDO
+; Use full outline paths for refile targets
 (setq org-refile-use-outline-path t)
 
-; Targets complete directly with IDO
 (setq org-outline-path-complete-in-steps nil)
 
 ; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
-
-; Use IDO for both buffer and file completion and ido-everywhere to t
-(setq org-completion-use-ido t)
-(setq ido-everywhere t)
-(setq ido-max-directory-size 100000)
-(ido-mode (quote both))
-; Use the current window when visiting files and buffers with ido
-(setq ido-default-file-method 'selected-window)
-(setq ido-default-buffer-method 'selected-window)
-; Use the current window for indirect buffer display
-(setq org-indirect-buffer-display 'current-window)
 
 ;;;; Refile settings
 ; Exclude DONE state tasks from refile targets
@@ -883,9 +874,27 @@ Here is my refile configuration:
 (setq org-refile-target-verify-function 'bh/verify-refile-target)
 #+end_src
 
+Here is the setting to complete using ido.  And now I've quit ido.
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+; Use IDO for both buffer and file completion and ido-everywhere to t
+(setq org-completion-use-ido t)
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(ido-mode (quote both))
+; Use the current window when visiting files and buffers with ido
+(setq ido-default-file-method 'selected-window)
+(setq ido-default-buffer-method 'selected-window)
+; Use the current window for indirect buffer display
+(setq org-indirect-buffer-display 'current-window)
+#+END_SRC
+
 To refile a task to my =norang.org= file under =System Maintenance= I
 just put the cursor on the task and hit =C-c C-w= and enter =nor C-SPC
 sys RET= and it's done.  IDO completion makes locating targets a snap.
+
+Now I've switched from ido to helm. 
+*** FIXME add use case for helm
 ** Refiling Tasks
 :PROPERTIES:
 :CUSTOM_ID: RefilingTasks
@@ -2757,7 +2766,7 @@ I have the following setup for the exporters I use.
 Alphabetical listing options need to be set before the exporters are
 loaded for filling to work correctly.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (setq org-alphabetical-lists t)
 
@@ -2829,7 +2838,7 @@ The setup is really easy.  =ditaa= is provided with the org-mode
 source.  You'll have to install the =graphviz= and =PlantUML= packages
 on your system.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (setq org-ditaa-jar-path "~/git/org-mode/contrib/scripts/ditaa.jar")
 (setq org-plantuml-jar-path "~/java/plantuml.jar")
@@ -2881,7 +2890,7 @@ session.  It's much more important for me to be able to access my
 org files from my Android phone remotely than it is to see images on
 startup.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Don't enable this because it breaks access to emacs from my Android phone
 (setq org-startup-with-inline-images nil)
@@ -2908,30 +2917,33 @@ The source for a ditaa graphic looks like this in org-mode:
 Here's an example without the =#+begin_src= and =#+end_src= lines.
 
 #+begin_src ditaa :file communication.png :cmdline -r -s 0.8 :exports both :cache yes
-    +-----------+        +---------+  
-    |    PLC    |        |         |                
-    |  Network  +<------>+   PLC   +<---=---------+ 
-    |    cRED   |        |  c707   |              | 
-    +-----------+        +----+----+              | 
-                              ^                   | 
-                              |                   | 
-                              |  +----------------|-----------------+
-                              |  |                |                 |
-                              v  v                v                 v
-      +----------+       +----+--+--+      +-------+---+      +-----+-----+       Windows clients
-      |          |       |          |      |           |      |           |      +----+      +----+
-      | Database +<----->+  Shared  +<---->+ Executive +<-=-->+ Operator  +<---->|cYEL| . . .|cYEL|
-      |   c707   |       |  Memory  |      |   c707    |      | Server    |      |    |      |    |
-      +--+----+--+       |{d} cGRE  |      +------+----+      |   c707    |      +----+      +----+
-         ^    ^          +----------+             ^           +-------+---+
-         |    |                                   |                        
-         |    +--------=--------------------------+                    
-         v                                                             
-+--------+--------+                                                         
-|                 |                                                         
-| Millwide System |            -------- Data ---------                      
-| cBLU            |            --=----- Signals ---=--                      
-+-----------------+                                                         
+      +-----------+        +---------+  
+      |    PLC    |        |         |                
+      |  Network  +<------>+   PLC   +<---=---------+ 
+      |    cRED   |        |  c707   |              | 
+      +-----------+        +----+----+              | 
+                                ^                   | 
+                                |                   | 
+                                |  +----------------|-----------------+
+                                |  |                |                 |
+                                v  v                v                 v
+        +----------+       +----+--+--+      +-------+---+      +-----+-----+       Windows clients
+        |          |       |          |      |           |      |           |      +----+      +----+
+        | Database +<----->+  Shared  +<---->+ Executive +<-=-->+ Operator  +<---->|cYEL| . . .|cYEL|
+        |   c707   |       |  Memory  |      |   c707    |      | Server    |      |    |      |    |
+        +--+----+--+       |{d} cGRE  |      +------+----+      |   c707    |      +----+      +----+
+           ^    ^          +----------+             ^           +-------+---+
+           |    |                                   |                 ^      
+           |    +--------=--------------------------+                 |  
+           v                                                          |  
+  +--------+--------+                                           +-------------+
+  |                 |                                           |             |
+  | Millwide System |            -------- Data ---------        | My test box |
+  | cBLU            |            --=----- Signals ---=--        |             |
+  +-----------------+                                           | cPNK        |
+                                                                |             |
+                                                                |             |
+                                                                +-------------+
 #+end_src
 
 #+results[57642756cd4e509e2a4f67c40a5147ecb935933e]:

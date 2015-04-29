@@ -5,3 +5,7 @@ auto-save-list/
 elpa/
 ido.last
 bookmarks
+history
+image-dired/
+.emacs.desktop*
+.session
