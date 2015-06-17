@@ -1719,6 +1719,26 @@ The following setting shows 1 minute clocking gaps.
               :max-gap 0
               :gap-ok-around ("4:00"))))
 #+end_src
+
+** Clock for classes
+
+I'm a student and I always learn things.  So I have a org file
+=study.org= comprises of all learning quests.  It's good to let the
+clock modeline to just show the clocksum only on today.  To do so, I
+set a property at the header of the file:
+
+#+BEGIN_EXAMPLE
+#+PROPERTY: CLOCK_MODELINE_TOTAL today
+#+END_EXAMPLE
+
+And to let all the sub-projects in the file inherit this property, I
+should toggle this option:
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq org-use-property-inheritance t)
+#+END_SRC
+
 * Time reporting and tracking
 :PROPERTIES:
 :CUSTOM_ID: TimeReportingAndTracking
