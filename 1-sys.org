@@ -437,6 +437,20 @@ Usage: =M-x scratch= to open a scratch buffer for *current* major mode.
 #+BEGIN_SRC emacs-lisp
 (require-package 'scratch)
 #+END_SRC
+* Editing utils
+
+To disable backup and auto-save in Emacs:
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq-default make-backup-files nil
+                backup-inhibited t)
+
+#+END_SRC
+
+Cause this will mess up my working directory and almost all of my
+stuffs are in github so this utility is pointless to me.
+
 * Appearance
 ** Color theme
 
@@ -988,6 +1002,170 @@ A handful calculator.
 *** [[http://tuhdo.github.io/helm-intro.html#sec-28][helm-eshell-history]] =C-c C-l=
 *** [[http://tuhdo.github.io/helm-projectile.html][Helm Projectile]]
 **** [[http://tuhdo.github.io/helm-intro.html#sec-31][Setup]]
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'projectile)
+  (require-package 'helm-projectile)
+  (require 'projectile)
+  (require 'helm-projectile)
+  (projectile-global-mode)
+  (helm-projectile-on)
+
+#+END_SRC
+
+Currently the =projectile= auto treats =git=, =mercurial=, =darcs= and
+=bazaar= repository as a project.  If you want to mark a folder as a
+project just create an empty *.projectile* file in it.  Some of
+=projectile= features:
+
+  - jump to a file in project
+  - jump to files at point in project
+  - jump to a directory in project
+  - jump to a file in a directory
+  - jump to a project buffer
+  - jump to a test in project
+  - toggle between files with same names but different extensions
+    (e.g. =.h= <-> =.c/.cpp=, =Genfile= <-> =Genfile.lock=)
+  - toggle between code and its test
+  - jump to recently visited files in the project
+  - switch between projects you have worked on
+  - kill all project buffers
+  - replace in project
+  - multi-occur in project buffers
+  - grep in project
+  - regenerate project etags or gtags (require =ggtags=)
+  - visit project in dired
+  - run make in a project with a single key chord
+
+***** mode-line
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))
+#+END_SRC
+
+**** Usage
+
+| Key       | Function                                                     | Remarks                                         |
+|-----------+--------------------------------------------------------------+-------------------------------------------------|
+| C-c p C-h | help                                                         |                                                 |
+| C-c p p   | swithcing projects                                           | With =C-u= prefix it will clear the cache first |
+| C-c p f   | find file in current project                                 | Use =C-c p 4 f= to open in other window         |
+| C-c p F   | find file in all known projects                              |                                                 |
+| C-c p g   | find file at the point in current project                    |                                                 |
+| C-c p d   | switch to dired in current project                           | With =C-u= prefix it will clear the cache first |
+| C-c p a   | switch to same-name file with differ extension               |                                                 |
+| C-c p T   | find test file in current project                            |                                                 |
+| C-c p l   | find file in current directory                               |                                                 |
+| C-c p s g | multi-occur in current project                               | g for =gnu=; a for =ack=; s for =ag=            |
+| C-c p r   | query-replace in current project                             |                                                 |
+| C-c p D   | open root project                                            |                                                 |
+| C-c p !   | runs =shell-command= in root of project                      |                                                 |
+| C-c p &   | runs =async-shell-command= in root of project                |                                                 |
+| C-c p c   | runs a standard compilation command for your type of project |                                                 |
+| C-c p P   | runs a standard test command for yor type of project         |                                                 |
+| C-c p t   | toggle between implementation and its test file              | Use =C-c p 4 t= to open in other window         |
+| C-c p k   | kills all project buffer                                     |                                                 |
+| C-c p S   | save all project buffers                                     |                                                 |
+| C-c p ESC | switch to most recently selected projectile buffer           |                                                 |
+
+Useful Helm actions
+| Key   | Function                |
+|-------+-------------------------|
+| C-c @ | insert as an Org link   |
+| M-S   | symlink files           |
+|-------+-------------------------|
+| C-=   | ediff file              |
+| C-c = | emerge file             |
+| M-.   | etags                   |
+| M-e   | switch to eshell        |
+| M-!   | eshell command on files |
+| C-c p | print marked files      |
+
+Some other not-that-common-used commands
+| Key       | Function                                                           |
+|-----------+--------------------------------------------------------------------|
+| C-c p e   | find recently visited files                                        |
+| C-c p i   | invalidates the project cache                                      |
+| C-c p R   | regenerates project TAGS file                                      |
+| C-c p j   | find tag in TAGS file                                              |
+| C-c p z   | add current file to cache                                          |
+| C-c p m   | run the commander (an interface to run commands with a single key) |
+
+**** Switching projects =C-c p p=
+
+The action after switched project is optional:
+
+  - =projectile-find-file=: it will continue to ask for a file to
+    visit
+  - =projectile-find-file-in-known-projects=: it will lists all known
+    projects' files
+  - =projectile-find-file-dwim=: it will tries to search path at the
+    point first
+  - =projectile-dired=: it will open top-level directory
+  - =projectile-find-dir=: it will continue to ask for a directory to
+    visit
+
+Currently this setting is not settled.  I will have to try this
+workflow a little bit to confirm the best choice.  I think to let this
+command to open a directory is better cause there are other commands
+to open projectile files.  So I can switch to a project, explore its
+file system for a while, and open one or more specific file(s) then.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq projectile-switch-project-action 'projectile-dired)
+
+  ;; make `find-dir' includes function of `projectile-dired'
+  (setq projectile-find-dir-includes-top-level t)
+#+END_SRC
+
+**** Ignoring files
+
+If you like to make =projectile= ignore certain files, edit your
+=.projectile= file.  Every path is relative to the root directory and
+start with a slash.  Every pattern is not start with a slash.  Here is
+the example from the [[https://github.com/bbatsov/projectile][projectile github page]].
+
+#+BEGIN_EXAMPLE
+-/log
+-/tmp
+-/vendor
+-/public/uploads
+
+-tmp
+-*.rb
+-*.yml
+-models
+#+END_EXAMPLE
+
+Or you can ignore everything except certain subdirectories:
+
+#+BEGIN_EXAMPLE
++/src/foo
++/tests/foo
+#+END_EXAMPLE
+
+Patterns do not support this syntax.
+
+**** Local varible
+
+See [[https://github.com/bbatsov/projectile#storing-project-settings][here]].
+
+**** Virtual directory
+
+You can create a virtual directory to store a group of files from
+anywhere.
+
+The according Helm commands:
+| Key   | Function                                    |
+|-------+---------------------------------------------|
+| C-c f | create virtual dired buffer from candidates |
+| C-c a | add files to dired buffer                   |
+| C-c d | remove files from dired buffer              | 
+
+After created, you can store it with [[*bookmark+][bookmark]].
+
 *** helm-descbinds
 **** [[http://tuhdo.github.io/helm-intro.html#sec-32][Setup]]
 *** helm-gtags
@@ -1042,4 +1220,16 @@ Purcell used the following configuration:
     (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)))
 
 #+END_SRC
+
+
+** bookmark+
+
+*** Basic bookmark usage
+
+| Key               | Function                  |
+|-------------------+---------------------------|
+| C-x r m           | set bookmark at the point |
+| C-x r b           | jump to the bookmark      |
+| C-x r l           | list all bookmarks        |
+| M-x bookmark-save | save all bookmarks        |
 

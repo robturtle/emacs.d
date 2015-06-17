@@ -1,0 +1,1 @@
+("~/.emacs.d/" "~/git/org/" "~/OLD_EMACS/" "~/git/cpp/" "~/git/ruby/" "~/git/CPP/" "~/git/Haskell/")

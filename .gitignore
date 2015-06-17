@@ -10,3 +10,4 @@ image-dired/
 .emacs.desktop*
 .session
 *~
+projectile.cache
