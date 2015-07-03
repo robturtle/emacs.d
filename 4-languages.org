@@ -1,0 +1,135 @@
+#+title: Languages Support
+
+* Haskell
+
+| Key   | Function                       |
+|-------+--------------------------------|
+| C-c h | query hoogle help at the point |
+
+The editting utilities are provided by major mode:
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'haskell-mode)
+
+#+END_SRC
+
+** Unicode representation
+Emacs supports a fancy representation for Haskell keywords (e.g. an
+unicode lambda symbol replaces the normal 'lambda' string). To turn it
+on:
+
+FIXME: Currently it seems not work with flycheck, I'll fix it later.
+
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+
+#+END_SRC
+
+** Syntax check
+
+*NOTE* this depends on [[file:3-sematics.org::*flycheck][flycheck]]. Make sure the flycheck is set up
+properly.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (when (and (maybe-require-package 'flycheck-haskell)
+             (require-package 'flycheck-hdevtools))
+    (after-load 'flycheck
+                (add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
+
+                (defun sanityinc/flycheck-haskell-reconfigure ()
+                  "Reconfigure flycheck haskell settings, e.g. after changing cabal file."
+                  (interactive)
+                  (unless (eq major-mode 'haskell-mode)
+                    (error "Expected to be in haskell-mode"))
+                  (flycheck-haskell-clear-config-cache)
+                  (flycheck-haskell-configure)
+                  (flycheck-mode -1)
+                  (flycheck-mode))
+
+                (defadvice haskell-mode-stylish-buffer (around skip-if-flycheck-errors activate)
+                  "Don't run stylish-buffer if the buffer appears to have a syntax error.
+  This isn't a hard guarantee, since flycheck might sometimes not run until the file has
+  been saved."
+                  (unless (flycheck-has-current-errors-p 'error)
+                    ad-do-it))
+
+                (require 'flycheck-hdevtools)))
+
+#+END_SRC
+** Documentations
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (dolist (hook '(haskell-mode-hook inferior-haskell-mode-hook haskell-interactive-mode-hook))
+    (add-hook hook 'turn-on-haskell-doc-mode)
+    (add-hook hook (lambda () (subword-mode +1)))
+    (add-hook hook (lambda () (eldoc-mode 1))))
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+
+  (add-hook 'haskell-interactive-mode-hook 'sanityinc/no-trailing-whitespace)
+
+#+END_SRC
+
+** Interaction
+
+Require diminish.el
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'diminish)
+  (require 'diminish)
+  (after-load 'haskell
+    (diminish 'interactive-haskell-mode " IntHS"))
+
+  (add-auto-mode 'haskell-mode "\\.ghci\\'")
+
+  (when (maybe-require-package 'ghci-completion)
+    (add-hook 'inferior-haskell-mode-hook 'turn-on-ghci-completion))
+
+#+END_SRC
+
+** Indentation
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'hi2)
+  (add-hook 'haskell-mode-hook 'turn-on-hi2)
+
+#+END_SRC
+
+** Source Help
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+
+  (setq-default haskell-stylish-on-save t)
+
+  (maybe-require-package 'hayoo)
+  (after-load 'haskell-mode
+    (define-key haskell-mode-map (kbd "C-c h") 'hoogle)
+    (define-key haskell-mode-map (kbd "C-o") 'open-line))
+
+
+  (after-load 'page-break-lines
+    (push 'haskell-mode page-break-lines-modes))
+
+#+END_SRC
+
+** Compilation Mode Support
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; Make compilation-mode understand "at blah.hs:11:34-50" lines output by GHC
+  (after-load 'compile
+    (let ((alias 'ghc-at-regexp))
+      (add-to-list
+       'compilation-error-regexp-alist-alist
+       (list alias " at \\(.*\\.\\(?:l?[gh]hs\\|hi\\)\\):\\([0-9]+\\):\\([0-9]+\\)-[0-9]+$" 1 2 3 0 1))
+      (add-to-list
+       'compilation-error-regexp-alist alias)))
+
+#+END_SRC

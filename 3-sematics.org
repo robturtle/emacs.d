@@ -1,0 +1,25 @@
+#+title: Sematics
+
+This file includes several facilities for programming such as syntax
+check and auto-completion.
+
+* flycheck
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (when (maybe-require-package 'flycheck)
+    (add-hook 'after-init-hook 'global-flycheck-mode)
+
+    ;;; find a good place for this ycmd settings
+    ;(require-package 'flycheck-ycmd)
+    ;(require 'flycheck-ycmd)
+    ;(add-hook 'ycmd-file-parse-result-hook 'flycheck-ycmd--cache-parse-results)
+    ;(add-to-list 'flycheck-checkers 'ycmd)
+
+    ;; Override default flycheck triggers
+    (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled)
+          flycheck-idle-change-delay 0.8)
+
+    (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
+
+#+END_SRC
