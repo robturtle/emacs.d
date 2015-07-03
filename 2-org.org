@@ -3480,7 +3480,7 @@ automatically updated the next time I look at the agenda.
 :CUSTOM_ID: ReminderSetup
 :END:
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ; Erase all reminders and rebuilt reminders for today from the agenda
 (defun bh/org-agenda-to-appt ()
@@ -4231,14 +4231,12 @@ appropriate time.
 :CUSTOM_ID: DiaryForAppointments
 :END:
 
-I don't use the emacs Diary for anything but I like seeing the
-holidays on my agenda.  This helps with planning for those days when
-you're not supposed to be working.
+I still like to see the default diary.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
-(setq org-agenda-include-diary nil)
-(setq org-agenda-diary-file "~/git/org/diary.org")
+(setq org-agenda-include-diary t)
+;(setq org-agenda-diary-file "~/git/org/diary.org")
 #+end_src
 
 The diary file keeps =date-tree= entries created by the capture mode
