@@ -27,9 +27,10 @@ files.  Currently there are 3 levels:
 #+END_SRC
 
 The current progress of translating Steve Purcell's config is:
-
-*** NEXT [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [2/10]		:ORG:
+** TODO [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [1/10] 		:ORG:
     :LOGBOOK:
+    CLOCK: [2015-04-30 Thu 22:08]--[2015-04-30 Thu 22:09] =>  0:01
+    CLOCK: [2015-04-30 Thu 22:07]--[2015-04-30 Thu 22:08] =>  0:01
     CLOCK: [2015-04-27 Mon 16:02]--[2015-04-27 Mon 16:04] =>  0:02
     CLOCK: [2015-04-27 Mon 14:55]--[2015-04-27 Mon 15:54] =>  0:59
     CLOCK: [2015-04-27 Mon 14:49]--[2015-04-27 Mon 14:53] =>  0:04
@@ -39,6 +40,11 @@ The current progress of translating Steve Purcell's config is:
   [2015-04-27 Mon 14:01]
   - [X] personal info
 **** DONE Bootstrap config [4/4]
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      :LOGBOOK:
      CLOCK: [2015-04-27 Mon 16:04]--[2015-04-27 Mon 16:47] =>  0:43
      :END:
@@ -47,6 +53,11 @@ The current progress of translating Steve Purcell's config is:
      - [X] package manager - elpa
      - [X] set up $PATH; for Windows Emacs - exec-path
 **** HOLD base packages [1/4]					       :HOLD:
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      - State "HOLD"       from "NEXT"       [2015-04-28 Tue 21:14] \\
        Some of these packages I don't think I ll use them currently.
        So I ll just leave it.
@@ -57,7 +68,14 @@ The current progress of translating Steve Purcell's config is:
      - [ ] minor mode with no modeline display - dimnish
      - [X] mode-specific scratch buffers - scratch
      - [ ] log keyboard commands to buffer - mwe-log-commands
-**** NEXT Load config for specific features & modes [2/25]
+**** WAITING Load config for specific features & modes [3/25] 	    :WAITING:
+     :PROPERTIES:
+     :END:
+     - State "WAITING"    from "NEXT"       [2015-04-30 Thu 23:57] \\
+       wait for navigation
+     :PROPERTIES:
+    
+    :END:
      :LOGBOOK:
      CLOCK: [2015-04-28 Tue 21:40]--[2015-04-28 Tue 22:24] =>  0:44
      CLOCK: [2015-04-28 Tue 21:16]--[2015-04-28 Tue 21:28] =>  0:12
@@ -79,7 +97,7 @@ The current progress of translating Steve Purcell's config is:
      - [ ] grep
      - [ ] uniquify
      - [ ] ibuffer
-     - [ ] *flycheck*
+     - [X] *flycheck*
      - [ ] recentf
      - [ ] ido
      - [ ] mmm
@@ -92,14 +110,23 @@ The current progress of translating Steve Purcell's config is:
      - [ ] regex-tool
      - [ ] server
 **** TODO Text edit [0/5]
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      - [ ] hippie-expand
      - [ ] editing-utils
      - [ ] *company*
      - [ ] *yasnippet*
      - [ ] *doxymacs*
-**** NEXT Navigation & Projects Management - Projectile now [2/10]
-     SCHEDULED: <2015-04-30 Thu 09:00>
+**** NEXT Navigation & Projects Management - bookmark+ now [2/9]
      :LOGBOOK:
+     CLOCK: [2015-04-30 Thu 14:21]--[2015-04-30 Thu 14:50] =>  0:29
+     CLOCK: [2015-04-30 Thu 11:02]--[2015-04-30 Thu 11:37] =>  0:35
+     CLOCK: [2015-04-30 Thu 10:22]--[2015-04-30 Thu 10:47] =>  0:25
+     CLOCK: [2015-04-30 Thu 09:32]--[2015-04-30 Thu 10:15] =>  0:43
+     CLOCK: [2015-04-30 Thu 09:12]--[2015-04-30 Thu 09:24] =>  0:12
      CLOCK: [2015-04-29 Wed 21:23]--[2015-04-29 Wed 22:00] =>  0:37
      CLOCK: [2015-04-29 Wed 20:50]--[2015-04-29 Wed 21:22] =>  0:32
      CLOCK: [2015-04-29 Wed 18:32]--[2015-04-29 Wed 20:02] =>  1:30
@@ -110,22 +137,47 @@ The current progress of translating Steve Purcell's config is:
      CLOCK: [2015-04-28 Tue 22:55]--[2015-04-28 Tue 23:34] =>  0:39
      CLOCK: [2015-04-28 Tue 22:24]--[2015-04-28 Tue 22:34] =>  0:10
      :END:
+***** TODO *helm* [1/5]
 
-     - [-] *helm*
-       - [X] FIXME: helm org tags
-       - [ ] eshell-history
-       - [ ] *helm-projectile*
-       - [ ] descbinds
-       - [ ] helm-gtags
-     - [ ] *projectile*
-     - [ ] windows - should I install? - obsolete
-     - [X] sessions - should I install?
-     - [ ] *bookmark*
-     - [ ] vc - obsolete
-     - [ ] darcs - obsolete
-     - [ ] *git*
-     - [ ] *github*
-**** TODO Sematics & Language Support [0/17]
+      - State "WAITING"    from "NEXT"       [2015-04-30 Thu 23:55] \\
+	Waiting for bookmark+
+****** DONE FIXME: helm org tags
+****** NEXT *helm-projectile*
+******* NEXT use bookmark+ to store virtual dired buffer
+****** TODO eshell-history
+****** TODO descbinds
+****** TODO helm-gtags
+
+****** DONE IDO or helm?
+       :PROPERTIES:
+       :Effort:   2:00
+       :END:
+	:LOGBOOK:
+	CLOCK: [2015-04-29 Wed 10:34]--[2015-04-29 Wed 10:42] =>  0:08
+	:END:
+      [2015-04-29 Wed 01:01]
+***** DONE *projectile*
+***** NEXT *bookmark*
+      :LOGBOOK:
+      CLOCK: [2015-05-03 Sun 09:44]--[2015-05-03 Sun 09:45] =>  0:01
+      CLOCK: [2015-05-03 Sun 09:36]--[2015-05-03 Sun 09:43] =>  0:07
+      :END:
+***** [[https://github.com/nex3/perspective-el][perspective]] - I think I will not need it
+***** TODO windows - should I install? - obsolete
+***** DONE sessions - should I install?
+***** TODO vc - obsolete
+***** TODO darcs - obsolete
+***** TODO *git*
+***** TODO *github*
+**** NEXT Sematics & Language Support [1/17]
+     :PROPERTIES:
+     :END:
+     :LOGBOOK:
+     CLOCK: [2015-07-02 Thu 15:51]--[2015-07-02 Thu 17:00] =>  1:09
+     :END:
+    :PROPERTIES:
+    
+    :END:
      - [ ] semantic - should I install?
      - [ ] compile
      - [ ] cc
@@ -134,7 +186,7 @@ The current progress of translating Steve Purcell's config is:
      - [ ] csv
      - [ ] erlang
      - [ ] python - remember ipython notebooks
-     - [ ] haskell
+     - [X] haskell
      - [ ] ruby
      - [ ] rails
      - [ ] R
@@ -144,6 +196,11 @@ The current progress of translating Steve Purcell's config is:
      - [ ] clojure
      - [ ] lua
 **** TODO Front-end languages [0/11]
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      - [ ] javascript
      - [ ] php
      - [ ] org
@@ -156,8 +213,18 @@ The current progress of translating Steve Purcell's config is:
      - [ ] sql
      - [ ] dsvn
 **** TODO Documentation [0/1]
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      - [ ] dash
-**** NEXT Misc [0/3]
+**** TODO Misc [0/3]
+     :PROPERTIES:
+     :END:
+    :PROPERTIES:
+    
+    :END:
      :LOGBOOK:
      CLOCK: [2015-04-29 Wed 11:07]--[2015-04-29 Wed 11:08] =>  0:01
      CLOCK: [2015-04-29 Wed 10:42]--[2015-04-29 Wed 10:45] =>  0:03
@@ -165,21 +232,18 @@ The current progress of translating Steve Purcell's config is:
      - [ ] variables configured via the interactive 'customize' interface
      - [ ] allow users to provide optional 'init-local' containting personal settings
      - [ ] locales (setting them earlier in this file doesn't work in X)
-**** DONE IDO or helm?
-      :PROPERTIES:
-      :Effort:   2:00
-      :END:
-      :LOGBOOK:
-      CLOCK: [2015-04-29 Wed 10:34]--[2015-04-29 Wed 10:42] =>  0:08
-      :END:
-    [2015-04-29 Wed 01:01]
 **** NEXT [[file:~/.emacs.d][git push .emacs.d]]						:Git:
-     SCHEDULED: <2015-04-29 .+3d/7d>
+     SCHEDULED: <2015-06-18 Thu .+1d/7d>
      :PROPERTIES:
      :STYLE:    habit
      :REPEAT_TO_STATE: NEXT
+     :LAST_REPEAT: [2015-06-17 Wed 20:05]
      :END:
+     - State "DONE"       from "NEXT"       [2015-06-17 Wed 20:05]
+     - State "DONE"       from "NEXT"       [2015-04-29 Wed 23:42]
      :LOGBOOK:
-     CLOCK: [2015-04-29 Wed 23:26]
+     CLOCK: [2015-07-03 Fri 16:58]
+     CLOCK: [2015-06-17 Wed 19:59]--[2015-06-17 Wed 20:05] =>  0:06
+     CLOCK: [2015-04-29 Wed 23:26]--[2015-04-29 Wed 23:42] =>  0:16
      :END:
    [2015-04-29 Wed 23:21]
