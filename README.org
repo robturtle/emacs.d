@@ -27,7 +27,7 @@ files.  Currently there are 3 levels:
 #+END_SRC
 
 The current progress of translating Steve Purcell's config is:
-** TODO [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [1/10] 		:ORG:
+** TODO [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [2/10]        :@network:ORG:
     :LOGBOOK:
     CLOCK: [2015-04-30 Thu 22:08]--[2015-04-30 Thu 22:09] =>  0:01
     CLOCK: [2015-04-30 Thu 22:07]--[2015-04-30 Thu 22:08] =>  0:01
@@ -109,7 +109,7 @@ The current progress of translating Steve Purcell's config is:
      - [ ] osx-location
      - [ ] regex-tool
      - [ ] server
-**** TODO Text edit [0/5]
+**** NEXT Text edit [0/5]
      :PROPERTIES:
      :END:
     :PROPERTIES:
@@ -120,7 +120,7 @@ The current progress of translating Steve Purcell's config is:
      - [ ] *company*
      - [ ] *yasnippet*
      - [ ] *doxymacs*
-**** NEXT Navigation & Projects Management - bookmark+ now [2/9]
+**** DONE Navigation & Projects Management - bookmark+ now [6/6]
      :LOGBOOK:
      CLOCK: [2015-04-30 Thu 14:21]--[2015-04-30 Thu 14:50] =>  0:29
      CLOCK: [2015-04-30 Thu 11:02]--[2015-04-30 Thu 11:37] =>  0:35
@@ -137,16 +137,34 @@ The current progress of translating Steve Purcell's config is:
      CLOCK: [2015-04-28 Tue 22:55]--[2015-04-28 Tue 23:34] =>  0:39
      CLOCK: [2015-04-28 Tue 22:24]--[2015-04-28 Tue 22:34] =>  0:10
      :END:
-***** TODO *helm* [1/5]
+***** DONE *helm* [6/6]
 
       - State "WAITING"    from "NEXT"       [2015-04-30 Thu 23:55] \\
 	Waiting for bookmark+
 ****** DONE FIXME: helm org tags
-****** NEXT *helm-projectile*
-******* NEXT use bookmark+ to store virtual dired buffer
-****** TODO eshell-history
-****** TODO descbinds
-****** TODO helm-gtags
+****** DONE *helm-projectile*
+       :LOGBOOK:
+       CLOCK: [2015-07-07 Tue 11:03]--[2015-07-07 Tue 11:04] =>  0:01
+       :END:
+******* DONE use bookmark+ to store virtual dired buffer
+	:LOGBOOK:
+	CLOCK: [2015-07-07 Tue 11:04]--[2015-07-07 Tue 11:31] =>  0:27
+	CLOCK: [2015-07-07 Tue 10:31]--[2015-07-07 Tue 11:03] =>  0:32
+	CLOCK: [2015-07-07 Tue 08:51]--[2015-07-07 Tue 10:22] =>  1:31
+	:END:
+****** DONE eshell-history
+       :LOGBOOK:
+       CLOCK: [2015-07-09 Thu 10:49]--[2015-07-09 Thu 10:55] =>  0:06
+       :END:
+****** DONE descbinds
+       :LOGBOOK:
+       CLOCK: [2015-07-09 Thu 11:04]--[2015-07-09 Thu 11:05] =>  0:01
+       CLOCK: [2015-07-09 Thu 10:55]--[2015-07-09 Thu 11:01] =>  0:06
+       :END:
+****** DONE helm-gtags
+       :LOGBOOK:
+       CLOCK: [2015-07-09 Thu 11:06]--[2015-07-09 Thu 11:08] =>  0:02
+       :END:
 
 ****** DONE IDO or helm?
        :PROPERTIES:
@@ -157,19 +175,26 @@ The current progress of translating Steve Purcell's config is:
 	:END:
       [2015-04-29 Wed 01:01]
 ***** DONE *projectile*
-***** NEXT *bookmark*
+***** DONE *bookmark*
       :LOGBOOK:
       CLOCK: [2015-05-03 Sun 09:44]--[2015-05-03 Sun 09:45] =>  0:01
       CLOCK: [2015-05-03 Sun 09:36]--[2015-05-03 Sun 09:43] =>  0:07
       :END:
 ***** [[https://github.com/nex3/perspective-el][perspective]] - I think I will not need it
-***** TODO windows - should I install? - obsolete
-***** DONE sessions - should I install?
-***** TODO vc - obsolete
-***** TODO darcs - obsolete
-***** TODO *git*
-***** TODO *github*
-**** NEXT Sematics & Language Support [1/17]
+***** windows - should I install? - obsolete
+***** DONE sessions
+***** vc - obsolete
+***** darcs - obsolete
+***** DONE *git*
+      :LOGBOOK:
+      CLOCK: [2015-07-09 Thu 11:25]--[2015-07-09 Thu 11:52] =>  0:27
+      CLOCK: [2015-07-09 Thu 11:11]--[2015-07-09 Thu 11:25] =>  0:14
+      :END:
+***** DONE *github*
+      :LOGBOOK:
+      CLOCK: [2015-07-09 Thu 11:53]--[2015-07-09 Thu 11:57] =>  0:04
+      :END:
+**** TODO Sematics & Language Support [1/17]
      :PROPERTIES:
      :END:
      :LOGBOOK:
@@ -232,17 +257,19 @@ The current progress of translating Steve Purcell's config is:
      - [ ] variables configured via the interactive 'customize' interface
      - [ ] allow users to provide optional 'init-local' containting personal settings
      - [ ] locales (setting them earlier in this file doesn't work in X)
-**** NEXT [[file:~/.emacs.d][git push .emacs.d]]						:Git:
-     SCHEDULED: <2015-06-18 Thu .+1d/7d>
+**** NEXT [[file:~/.emacs.d][git push .emacs.d]]			:Git:
+     SCHEDULED: <2015-07-10 Fri .+1d/7d>
      :PROPERTIES:
      :STYLE:    habit
      :REPEAT_TO_STATE: NEXT
-     :LAST_REPEAT: [2015-06-17 Wed 20:05]
+     :LAST_REPEAT: [2015-07-09 Thu 10:48]
      :END:
+     - State "DONE"       from "NEXT"       [2015-07-09 Thu 10:48]
+     - State "DONE"       from "NEXT"       [2015-07-03 Fri 17:10]
      - State "DONE"       from "NEXT"       [2015-06-17 Wed 20:05]
      - State "DONE"       from "NEXT"       [2015-04-29 Wed 23:42]
      :LOGBOOK:
-     CLOCK: [2015-07-03 Fri 16:58]
+     CLOCK: [2015-07-03 Fri 16:58]--[2015-07-03 Fri 17:10] =>  0:12
      CLOCK: [2015-06-17 Wed 19:59]--[2015-06-17 Wed 20:05] =>  0:06
      CLOCK: [2015-04-29 Wed 23:26]--[2015-04-29 Wed 23:42] =>  0:16
      :END:
