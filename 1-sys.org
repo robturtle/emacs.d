@@ -1000,6 +1000,19 @@ various inputs, and want to see result as fast as possible.
 **** helm-calcul-expression =C-comma=
 A handful calculator.
 *** [[http://tuhdo.github.io/helm-intro.html#sec-28][helm-eshell-history]] =C-c C-l=
+
+Use =C-c C-l= to explore eshell history.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-eshell)
+
+  (add-hook 'eshell-mode-hook
+            #'(lambda ()
+                (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
+
+#+END_SRC
+
 *** [[http://localhost:8080/Emacs/Exploring%2520large%2520projects%2520with%2520Projectile%2520and%2520Helm%2520Projectile.html][Helm Projectile]]
 **** [[http://tuhdo.github.io/helm-intro.html#sec-31][Setup]]
 #+header: :tangle yes
@@ -1166,8 +1179,16 @@ The according Helm commands:
 
 After created, you can store it with [[*bookmark+][bookmark]] with 'C-x p m`.
 
-*** helm-descbinds
-**** [[http://tuhdo.github.io/helm-intro.html#sec-32][Setup]]
+*** helm-descbinds =C-h b=
+
+Explore all the bindings.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'helm-descbinds)
+  (require 'helm-descbinds)
+  (helm-descbinds-mode)
+#+END_SRC
 *** helm-gtags
 =helm-gtags= is a helm interface for =GNU Global=.  The author
 recommanded the following configuration:
@@ -1192,7 +1213,7 @@ recommanded the following configuration:
 #+END_SRC
 
 Purcell used the following configuration:
-#+header: :tangle no
+#+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
 (setq
  helm-gtags-ignore-case t
