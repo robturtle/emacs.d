@@ -10,6 +10,20 @@
 | C-x v f   | vc git grep                    |                                   |
 | C-x v p   | git messenger                  |                                   |
 
+=C-x g= is git-gutter+'s leader key, its bindings are as below:
+
+| Key | Function                      |
+|-----+-------------------------------|
+| n   | next hunk                     |
+| p   | prev hunk                     |
+| '=' | show                          |
+| r   | revert hunk                   |
+| t   | stage hunk                    |
+| c   | commit hunk                   |
+| C   | stage and commit              |
+| C-y | stage and commit whole buffer |
+| U   | unstage whole buffer          |
+
 ** Setup
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
@@ -59,6 +73,27 @@
 
 #+END_SRC
 
+** git-gutter+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'git-gutter+
+    '(progn
+       ;;; Jump between hunks
+       (define-key git-gutter+-mode-map (kbd "C-x g n") 'git-gutter+-next-hunk)
+       (define-key git-gutter+-mode-map (kbd "C-x g p") 'git-gutter+-previous-hunk)
+
+       ;;; Act on hunks
+       (define-key git-gutter+-mode-map (kbd "C-x g =") 'git-gutter+-show-hunk)
+       (define-key git-gutter+-mode-map (kbd "C-x g r") 'git-gutter+-revert-hunks)
+       ;; Stage hunk at point.
+       ;; If region is active, stage all hunk lines within the region.
+       (define-key git-gutter+-mode-map (kbd "C-x g t") 'git-gutter+-stage-hunks)
+       (define-key git-gutter+-mode-map (kbd "C-x g c") 'git-gutter+-commit)
+       (define-key git-gutter+-mode-map (kbd "C-x g C") 'git-gutter+-stage-and-commit)
+       (define-key git-gutter+-mode-map (kbd "C-x g C-y") 'git-gutter+-stage-and-commit-whole-buffer)
+       (define-key git-gutter+-mode-map (kbd "C-x g U") 'git-gutter+-unstage-whole-buffer)))
+
+#+END_SRC
 ** git-wip
 
 #+header: :tangle no
