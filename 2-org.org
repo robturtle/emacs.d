@@ -1239,6 +1239,9 @@ the description above.
   "Automatic task exclusion in the agenda with / RET"
   (and (cond
         ((string= tag "hold") t)
+	((string= tag "waiting") t)
+	((string= tag "@network") t)
+	((string= tag "@home") t)
        )
        (concat "-" tag)))
 
@@ -2048,7 +2051,7 @@ be at the farm to make the call.
 ; Tags with fast selection keys
 (setq org-tag-alist (quote ((:startgroup)
                             ("@errand" . ?e)
-                            ("@office" . ?o)
+                            ("@network" . ?o)
                             ("@home" . ?H)
                             (:endgroup)
                             ("WAITING" . ?w)
@@ -3508,7 +3511,7 @@ automatically updated the next time I look at the agenda.
 
 This section is a miscellaneous collection of Emacs customizations that I use
 with org-mode so that it Works-For-Me(tm).
-** Abbrev-mode and Skeletons
+** [done] Abbrev-mode and Skeletons -- Switch to Snippets now
 :PROPERTIES:
 :CUSTOM_ID: AbbrevMode
 :END:
@@ -3549,7 +3552,7 @@ For convenience in activity diagrams I added =sif= and =sfor= and just
 change the labels for the synchronization bars.
 
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Enable abbrev-mode
 (add-hook 'org-mode-hook (lambda () (abbrev-mode 1)))
@@ -3841,7 +3844,7 @@ note left: Loop2: End for each address in addressbook
 
 I use rectangular cut and paste if I need to indent generated blocks.
 
-** Focus On Current Work
+** [done] Focus On Current Work
 :PROPERTIES:
 :CUSTOM_ID: FocusOnCurrentWork
 :END:
@@ -3866,7 +3869,7 @@ We now use:
 The agenda keeps widening the org buffer so this gives a convenient
 way to focus on what we are doing.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (global-set-key (kbd "<f5>") 'bh/org-todo)
 
@@ -4039,7 +4042,7 @@ in a narrowed state.  I use =S-f5= (or some other widening speed key
 like =U=, =W=, =F=) to widen back to the normal view.
 
 I also have the following setting to force showing the next headline.
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (setq org-show-entry-below (quote ((default))))
 #+end_src
@@ -4060,7 +4063,7 @@ agenda view back to normal.
 I have added key bindings for the agenda to allow using =C-c C-x <= in
 the agenda to set the restriction lock to the current task directly.
 The following elisp accomplishes this.
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (add-hook 'org-agenda-mode-hook
           '(lambda () (org-defkey org-agenda-mode-map "\C-c\C-x<" 'bh/set-agenda-restriction-lock))
@@ -4124,7 +4127,7 @@ and not the entire body of the agenda restriction.  I use the
 following setting to keep the highlight on the heading only (as was
 the case for pre-8.0 versions of org-mode)
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Limit restriction lock highlighting to the headline only
 (setq org-agenda-restriction-lock-highlight-subtree nil)
@@ -4149,7 +4152,7 @@ Another way is to invoke the agenda with =F12 < a= while visiting an
 org-mode file.  This limits the agenda view to just this file.  I
 occasionally use this to view a file not in my =org-agenda-files= in
 the agenda.
-** Tuning the Agenda Views
+** [done] Tuning the Agenda Views
 :PROPERTIES:
 :CUSTOM_ID: TuningAgendaViews
 :END:
@@ -4168,7 +4171,7 @@ mistake!
 
 The clock modeline time is also shown with a reverse background.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Always hilight the current agenda line
 (add-hook 'org-agenda-mode-hook
@@ -4176,7 +4179,7 @@ The clock modeline time is also shown with a reverse background.
           'append)
 #+end_src
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; The following custom-set-faces create the highlights
 (custom-set-faces
@@ -4203,7 +4206,7 @@ move on.
 The block agenda prevents display of tasks with deadlines or scheduled
 dates in the future so you can safely ignore these until the
 appropriate time.
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Keep tasks with dates on the global todo lists
 (setq org-agenda-todo-ignore-with-date nil)
@@ -4268,7 +4271,7 @@ I include holidays from the calendar in my =todo.org= file as follows:
 I use the following setting so any time strings in the heading are
 shown in the agenda.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 (setq org-agenda-insert-diary-extract-time t)
 #+end_src
@@ -4284,7 +4287,7 @@ to dig up old information from the archives.
 I don't need this often but it sure is handy on the occasions that
 I do need it.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Include agenda archive files when searching for things
 (setq org-agenda-text-search-extra-files (quote (agenda-archives)))
@@ -4318,7 +4321,7 @@ following order:
 The lisp for this isn't particularly pretty but it works.
 
 Here are the =.emacs= settings:
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Show all future entries for repeating tasks
 (setq org-agenda-repeating-timestamp-show-all t)
@@ -4451,7 +4454,7 @@ exists it will display the existing view.  =g= forces regeneration of the agenda
 I normally have two views displayed (=F12 a= for the daily/weekly
 agenda and =F12 SPC= for my project management view)
 
-#+header: :tangle no
+#+header: :tangle yes
 #+begin_src emacs-lisp
 ;; Use sticky agenda's so they persist
 (setq org-agenda-sticky t)
@@ -5786,7 +5789,7 @@ in the =org-mode-hook= to generate mail from an org-mode subtree.
 
 I skip multiple timestamps for the same entry in the agenda view with the following setting.
 
-#+header: :tangle yes
+#+header: :tangle no
 #+begin_src emacs-lisp
 (setq org-agenda-skip-additional-timestamps-same-entry t)
 #+end_src
