@@ -1000,7 +1000,7 @@ various inputs, and want to see result as fast as possible.
 **** helm-calcul-expression =C-comma=
 A handful calculator.
 *** [[http://tuhdo.github.io/helm-intro.html#sec-28][helm-eshell-history]] =C-c C-l=
-*** [[http://tuhdo.github.io/helm-projectile.html][Helm Projectile]]
+*** [[http://localhost:8080/Emacs/Exploring%2520large%2520projects%2520with%2520Projectile%2520and%2520Helm%2520Projectile.html][Helm Projectile]]
 **** [[http://tuhdo.github.io/helm-intro.html#sec-31][Setup]]
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
@@ -1152,7 +1152,7 @@ Patterns do not support this syntax.
 
 See [[https://github.com/bbatsov/projectile#storing-project-settings][here]].
 
-**** Virtual directory
+**** [[http://tuhdo.github.io/helm-projectile.html#sec-7][Virtual directory]]
 
 You can create a virtual directory to store a group of files from
 anywhere.
@@ -1164,7 +1164,7 @@ The according Helm commands:
 | C-c a | add files to dired buffer                   |
 | C-c d | remove files from dired buffer              | 
 
-After created, you can store it with [[*bookmark+][bookmark]].
+After created, you can store it with [[*bookmark+][bookmark]] with 'C-x p m`.
 
 *** helm-descbinds
 **** [[http://tuhdo.github.io/helm-intro.html#sec-32][Setup]]
@@ -1223,7 +1223,6 @@ Purcell used the following configuration:
 
 
 ** bookmark+
-
 *** Basic bookmark usage
 
 | Key               | Function                  |
@@ -1233,3 +1232,67 @@ Purcell used the following configuration:
 | C-x r l           | list all bookmarks        |
 | M-x bookmark-save | save all bookmarks        |
 
+*** bookmark+ usage
+| Key         | Function                                  |
+|-------------+-------------------------------------------|
+| C-x p m     | set bookmark for file                     |
+| C-x j j     | jump to bookmark                          |
+| C-x 4 j j   | jump other window                         |
+| C-x p t + a | tag a file (creates an autofile bookmark) |
+| C-x p e     | list bookmarks                            | 
+
+Specified mode:
+| Key      | Function                     |
+|----------+------------------------------|
+| C-x j j  | normal jump                  |
+| C-x j d  | dired                        |
+| C-x j i  | info                         |
+| C-x j ,, | in current buffer            |
+| C-x p ,  | bookmark list current buffer |
+| C-x j t  | tag                          | 
+
+'C-x j t`:
+| key | Function               |
+|-----+------------------------|
+| %   | prefix of using regexp |
+| +/* | exists/all             | 
+
+#+BEGIN_EXAMPLE
+C-x j t % +
+# jump to bookmark have one/more tags matches the regexp
+C-x j t f % *
+# jump to file bookmark have all tags matches the regexpe
+#+END_EXAMPLE  
+
+Keys used in bookmark list:
+| Key     | Function                                                                        |
+|---------+---------------------------------------------------------------------------------|
+| T +/-   | add/remove some tags                                                            |
+| T m +   | mark the bookmarks that have particular tags. Hit 'RET` for every tag you type. |
+| U       | Unmark all bookmarks                                                            |
+| t       | toggle marked/unmarked bookmarks                                                |
+| M-d >   | dired the marked bookmarks                                                      |
+| [c-u] a | (edit)/show annotation                                                          |
+| r       | rename                                                                          |
+| e       | edit all bookmark info                                                          |
+| E       | edit all marked bookmarks                                                       |
+
+Kyes used in Dired buffer:
+| Key     | Function                          |
+|---------+-----------------------------------|
+| C-x r m | bookmark the dired directory      |
+| M-b     | bookmark each of the marked files |
+
+*** Setup
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'bookmark+)
+  (require 'bookmark+)
+#+END_SRC
+
+*** Extensions
+
+FIXME: requrie 'dired+.el` and 'highlight.el`. Fix it later
+
+After installed. use 'M-b` to autofile bookmark marked files.
