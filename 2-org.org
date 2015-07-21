@@ -1242,6 +1242,7 @@ the description above.
 	((string= tag "waiting") t)
 	((string= tag "@network") t)
 	((string= tag "@home") t)
+	((string= tag "game") t)
        )
        (concat "-" tag)))
 
