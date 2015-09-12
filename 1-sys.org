@@ -536,7 +536,7 @@ ignored: use `custom-enabled-themes' instead."
 
 #+END_SRC
 
-** GUI features
+** GUI features (tune transparency)				  :keys:NOTE:
 
 Most of the GUI features are supressed.  And add shorcuts to adjust
 fullscreen or opacity.
