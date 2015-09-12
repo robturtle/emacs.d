@@ -452,6 +452,15 @@ Cause this will mess up my working directory and almost all of my
 stuffs are in github so this utility is pointless to me.
 
 * Appearance
+** Modeline
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'smart-mode-line)
+  (require-package 'smart-mode-line-powerline-theme)
+  ;(setq sml/theme 'powerline)
+  (require 'smart-mode-line)
+  (add-hook 'after-init-hook 'sml/setup)
+#+END_SRC
 ** Color theme
 
 Switches: =M-x dark= and =M-x light=
