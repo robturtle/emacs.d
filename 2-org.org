@@ -2913,6 +2913,17 @@ Android phone) it fails when trying to display the images on a non-X
 session.  It's much more important for me to be able to access my 
 org files from my Android phone remotely than it is to see images on
 startup.
+#+END_QUOTE
+
+I don't do that geek thing like access an org file from an android phone.
+So I decide to preview images at start-up.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq org-startup-with-inline-images t)
+  ;; I also want to see the utf-8 math symbols at start-up
+  (setq org-pretty-entities t)
+#+END_SRC
 
 #+header: :tangle yes
 #+begin_src emacs-lisp
