@@ -100,14 +100,19 @@ General Public License v3 or later
 git describe --abbrev=4
 #+end_src
 
+#+results: org-mode-doc-version
+
 #+name: org-mode-version
 #+begin_src sh :exports none
 cd ~/git/org-mode && git describe HEAD
 #+end_src
 
-This is version call_org-mode-doc-version() of this document.  This
+#+results: org-mode-version
+: release_8.3beta-1075-gca2b398
+
+This is version call_org-mode-doc-version() {{{results(=nil=)}}} of this document.  This
 document is created using the publishing features of =org-mode= git
-version call_org-mode-version().
+version call_org-mode-version() {{{results(=release_8.3.1-234-g8c85c99=)}}}.
 
 The source for this document can be found as a [[http://doc.norang.ca/org-mode.org][plain text org file]].  I
 try to update this document about once a month.
@@ -2864,42 +2869,41 @@ on your system.
 
 #+header: :tangle yes
 #+begin_src emacs-lisp
-(setq org-ditaa-jar-path "~/git/org-mode/contrib/scripts/ditaa.jar")
-(setq org-plantuml-jar-path "~/java/plantuml.jar")
+  (setq org-ditaa-jar-path "~/git/org-mode/contrib/scripts/ditaa.jar")
+  (setq org-plantuml-jar-path "~/java/plantuml.jar")
 
-(add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
+  (add-hook 'org-babel-after-execute-hook 'bh/display-inline-images 'append)
 
-; Make babel results blocks lowercase
-(setq org-babel-results-keyword "results")
+  ; Make babel results blocks lowercase
+  (setq org-babel-results-keyword "results")
 
-(defun bh/display-inline-images ()
-  (condition-case nil
-      (org-display-inline-images)
-    (error nil)))
+  (defun bh/display-inline-images ()
+          (org-display-inline-images nil t))
 
-(org-babel-do-load-languages
- (quote org-babel-load-languages)
- (quote ((emacs-lisp . t)
-         (dot . t)
-         (ditaa . t)
-         (R . t)
-         (python . t)
-         (ruby . t)
-         (gnuplot . t)
-         (clojure . t)
-         (sh . t)
-         (ledger . t)
-         (org . t)
-         (plantuml . t)
-         (latex . t))))
+  (org-babel-do-load-languages
+   (quote org-babel-load-languages)
+   (quote ((emacs-lisp . t)
+           (dot . t)
+           (ditaa . t)
+           (R . t)
+           (python . t)
+           (ruby . t)
+           (gnuplot . t)
+           (clojure . t)
+           (sh . t)
+           (ledger . t)
+           (org . t)
+           (plantuml . t)
+           (latex . t))))
 
-; Do not prompt to confirm evaluation
-; This may be dangerous - make sure you understand the consequences
-; of setting this -- see the docstring for details
-(setq org-confirm-babel-evaluate nil)
+  ; Do not prompt to confirm evaluation
+  ; This may be dangerous - make sure you understand the consequences
+  ; of setting this -- see the docstring for details
+  (setq org-confirm-babel-evaluate nil)
 
-; Use fundamental mode when editing plantuml blocks with C-c '
-(add-to-list 'org-src-lang-modes (quote ("plantuml" . fundamental)))
+  ; Use fundamental mode when editing plantuml blocks with C-c '
+  (add-to-list 'org-src-lang-modes (quote ("plantuml" . fundamental)))
+
 #+end_src
 
 Now you just create a =begin-src= block for the appropriate tool, edit
@@ -2907,6 +2911,7 @@ the text, and build the pictures with =C-c C-c=.  After evaluating the
 block results are displayed.  You can toggle display of inline images
 with =C-c C-x C-v=
 
+#+BEGIN_QUOTE
 I disable startup with inline images because when I access my
 org-files from an SSH session without X this breaks (say from my
 Android phone) it fails when trying to display the images on a non-X
@@ -2925,11 +2930,12 @@ So I decide to preview images at start-up.
   (setq org-pretty-entities t)
 #+END_SRC
 
+The image don't refresh quickly, maybe I need to reset this to fix it:
 #+header: :tangle yes
-#+begin_src emacs-lisp
-;; Don't enable this because it breaks access to emacs from my Android phone
-(setq org-startup-with-inline-images nil)
-#+end_src
+#+BEGIN_SRC emacs-lisp
+  (setq image-cache-eviction-delay 1)
+#+END_SRC
+
 ** Playing with ditaa
 :PROPERTIES:
 :CUSTOM_ID: playingwithditaa
@@ -2963,10 +2969,10 @@ Here's an example without the =#+begin_src= and =#+end_src= lines.
                                 |  |                |                 |
                                 v  v                v                 v
         +----------+       +----+--+--+      +-------+---+      +-----+-----+       Windows clients
-        |          |       |          |      |           |      |           |      +----+      +----+
-        | Database +<----->+  Shared  +<---->+ Executive +<-=-->+ Operator  +<---->|cYEL| . . .|cYEL|
-        |   c707   |       |  Memory  |      |   c707    |      | Server    |      |    |      |    |
-        +--+----+--+       |{d} cGRE  |      +------+----+      |   c707    |      +----+      +----+
+        |          |       |          |      |           |      |           |      +----+      +----+ 
+        | Database +<----->+  Shared  +<---->+ Executive +<-=-->+ Operator  +<---->|cYEL| . . .|cYEL| 
+        |   c707   |       |  Memory  |      |   c707    |      | Server    |      |    |      |    | 
+        +--+----+--+       |{d} cGRE  |      +------+----+      |   c707    |      +----+      +----+ 
            ^    ^          +----------+             ^           +-------+---+
            |    |                                   |                 ^      
            |    +--------=--------------------------+                 |  
@@ -2981,7 +2987,7 @@ Here's an example without the =#+begin_src= and =#+end_src= lines.
                                                                 +-------------+
 #+end_src
 
-#+results[57642756cd4e509e2a4f67c40a5147ecb935933e]:
+#+results[82bf0236e1fb799313e19f0c299e1810a11a75dd]:
 [[file:communication.png]]
 
 ** Playing with graphviz
@@ -3039,7 +3045,7 @@ digraph G {
 }
 #+end_src
 
-#+results[4bf665d19d319ee40e628cfc80170af69cfb776f]:
+#+results[296ce064f7aab7f79ba32a4e903ed7a31b01ca73]:
 [[file:gv01.png]]
 
 The =-Kdot= is optional (defaults to =dot=) but you can substitute other graphviz
@@ -3082,7 +3088,7 @@ Client -> Client: Saves token
 deactivate Client
 #+end_src
 
-#+results[6aff72a7a7c6801812c59c389114f65d462a61a0]:
+#+results[9b612e0e68cd747fc032d949b739f4c5b06dee21]:
 [[file:sequence.png]]
 
 *** Activity Diagram
