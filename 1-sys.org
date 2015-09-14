@@ -451,6 +451,76 @@ To disable backup and auto-save in Emacs:
 Cause this will mess up my working directory and almost all of my
 stuffs are in github so this utility is pointless to me.
 
+** math symbol input
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'xah-math-input)
+  (require 'xah-math-input)
+#+END_SRC
+
+** toggle window spliting
+In [[http://www.emacswiki.org/emacs/ToggleWindowSplit][the Emacs wiki]] there is a function to toggle window between vertical
+and horizontal splitting.  This is useful especially when your screen
+is too large that the =helm= always split your window horizontally.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (defun toggle-frame-split ()
+    "If the frame is split vertically, split it horizontally or vice versa.
+  Assumes that the frame is only split into two."
+    (interactive)
+    (unless (= (length (window-list)) 2) (error "Can only toggle a frame split in two"))
+    (let ((split-vertically-p (window-combined-p)))
+      (delete-window) ; closes current window
+      (if split-vertically-p
+          (split-window-horizontally)
+        (split-window-vertically)) ; gives us a split with the other window twice
+      (switch-to-buffer nil))) ; restore the original window in this part of the frame
+
+  (define-key ctl-x-4-map "t" 'toggle-frame-split)
+#+END_SRC
+
+** snippets
+I don't want to repeat again and again that how important and life
+changing this facility is.  In fact it's so good that make a programmer
+lazier and forgetting lots of basic sentences when getting out of it.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'yasnippet)
+  (require 'yasnippet)
+  (yas-global-mode 1)
+
+  ;;; select snippet using helm
+  (defun shk-yas/helm-prompt (prompt choices &optional display-fn)
+    "Use helm to select a snippet. Put this into `yas-prompt-functions.'"
+    (interactive)
+    (setq display-fn (or display-fn 'identity))
+    (if (require 'helm-config)
+        (let (tmpsource cands result rmap)
+          (setq cands (mapcar (lambda (x) (funcall display-fn x)) choices))
+          (setq rmap (mapcar (lambda (x) (cons (funcall display-fn x) x)) choices))
+          (setq tmpsource
+                (list
+                 (cons 'name prompt)
+                 (cons 'candidates cands)
+                 '(action . (("Expand" . (lambda (selection) selection))))
+                 ))
+          (setq result (helm-other-buffer '(tmpsource) "*helm-select-yasnippet"))
+          (if (null result)
+              (signal 'quit "user quit!")
+            (cdr (assoc result rmap))))
+      nil))
+  (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)
+
+  ;;; new shortcut
+  (define-key yas-minor-mode-map [(tab)] nil)
+  (define-key yas-minor-mode-map (kbd "TAB") nil)
+  (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  (define-key yas-minor-mode-map (kbd "M-j") 'yas-expand)
+#+END_SRC
+
 * Appearance
 ** Modeline
 #+header: :tangle yes
@@ -1251,7 +1321,6 @@ Purcell used the following configuration:
 
 #+END_SRC
 
-
 ** bookmark+
 *** Basic bookmark usage
 
@@ -1326,3 +1395,11 @@ Kyes used in Dired buffer:
 FIXME: requrie 'dired+.el` and 'highlight.el`. Fix it later
 
 After installed. use 'M-b` to autofile bookmark marked files.
+** cursor control
+Use ace-jump to control the exact move of the cursor
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'ace-jump-mode)
+  (define-key org-mode-map (kbd "C-c SPC") nil)
+  (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+#+END_SRC
