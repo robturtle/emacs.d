@@ -3430,6 +3430,27 @@ validation.  This is the =tmp= site which takes files from
 =/tmp/publish= and exports those files to a website publishing
 directory.  This makes it easy to try new throw-away things on a live
 server.
+
+** Latex exporting settings
+I want to create a class for my homeworks so they will automatically
+share the same layout and settings.  In order to do this, you must
+know how to create a LaTex class file and put it into a tex home
+directory so latex program can find it from everywhere.  I create [[https://gist.github.com/robturtle/37bd27d34c204e5f07b7][a
+gist]] to demonstrate this process.  And the final step is to add my
+class into the variable =org-latex-classes=:
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-latex-classes
+    '("networkHW" "\\documentclass{networkHW}"
+      ("\\section{%s}" . "\\section*{%s}")
+      ("\\subsection{%s}" . "\\subsection*{%s}")
+      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+    )
+#+END_SRC
+
 ** Miscellaneous Export Settings
 :PROPERTIES:
 :CUSTOM_ID: MiscBabelExportSettings
