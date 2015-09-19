@@ -55,12 +55,13 @@ error check and so on.
 I want flycheck to show eclim-problems. I found [[https://github.com/kleewho/emacs-eclim/blob/flycheck/flycheck-eclim.el][this]] file to do this
 job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
 
+The prerequiresites are flycheck-eclim file and flycheck.
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
-  (require 'flycheck-eclim)
-  (flycheck-eclim-setup)
+  (when (and (require 'flycheck)
+             (require 'flycheck-eclim))
+    (flycheck-eclim-setup))
 #+END_SRC
-
 
 * Haskell
 
@@ -195,7 +196,6 @@ Require diminish.el
        'compilation-error-regexp-alist alias)))
 
 #+END_SRC
-
 
 * Ruby
 
