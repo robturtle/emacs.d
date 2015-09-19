@@ -25,3 +25,23 @@ check and auto-completion.
     (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
 
 #+END_SRC
+
+** show popup error & support eclim errors
+
+I installed this mainly because it can show eclim's errors;
+
+I can't currently use this cause once I tangle it, it freeze my emacs.
+
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+  (require-package 'flycheck-tip)
+  (require 'flycheck-tip)
+
+  ;; using its popup menu instead of flycheck's echo area for showing erros
+  (flycheck-tip-use-timer 'verbose)
+
+  ;; specify shortcuts for navigating through errors
+  (define-key c++-mode-map (kbd "C-c C-n") 'flycheck-tip-cycle)
+  (define-key c-mode-map (kbd "C-c C-n") 'flycheck-tip-cycle)
+  (define-key java-mode-map (kbd "C-c C-n") 'eclim-tip-cycle)
+#+END_SRC

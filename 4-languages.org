@@ -1,5 +1,67 @@
 #+title: Languages Support
 
+* C/C++ common
+Including CMake plugin and gdb settings.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;;; CMake
+  (require-package 'cmake-mode)
+  (require-package 'cmake-font-lock)
+  (require 'cmake-mode)
+  (require 'cmake-font-lock)
+
+  (add-auto-mode 'cmake-mode "CMakeLists\\.txt\\'" "\\.cmake\\'")
+
+  (require-package 'cmake-project)
+  (require 'cmake-project)
+
+  ;;; TODO enter cmake-project-mode only in CMake project
+  (add-hook 'c++-mode-hook 'cmake-project-mode)
+  (add-hook 'c-mode-hook 'cmake-project-mode)
+  ;(add-hook 'c-mode-common-hook 'ws-butler-mode)
+  ;(add-hook 'c-mode-common-hook 'doxymacs-mode)
+
+  
+  ;;; gdb
+  (setq-default
+   gdb-many-windows t
+   gdb-show-main t)
+
+#+END_SRC
+
+* Java
+
+Java has a great supporting tool called =elcim= which extract the
+backend of the Eclipse.  It provides project management, on the fly
+error check and so on.
+
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+  (require-package 'emacs-eclim)
+  (require 'eclim)
+  (require 'eclimd)
+  (global-eclim-mode)
+
+  
+
+  ;; company setup
+  (require 'company)
+  (require 'company-emacs-eclim)
+  (company-emacs-eclim-setup)
+#+END_SRC
+
+** flycheck integration
+I want flycheck to show eclim-problems. I found [[https://github.com/kleewho/emacs-eclim/blob/flycheck/flycheck-eclim.el][this]] file to do this
+job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require 'flycheck-eclim)
+  (flycheck-eclim-setup)
+#+END_SRC
+
+
 * Haskell
 
 | Key   | Function                       |
