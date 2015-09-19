@@ -521,6 +521,35 @@ lazier and forgetting lots of basic sentences when getting out of it.
   (define-key yas-minor-mode-map (kbd "M-j") 'yas-expand)
 #+END_SRC
 
+** company
+OK, I admitted that I have the tend to use the most latest
+package. That will conflicts the former configuration about this emacs
+configurations.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'company)
+
+  (add-hook 'after-init-hook 'global-company-mode)
+  (global-set-key [C-tab] 'company-complete)
+  (setq-default company-idle-delay 0)
+
+  
+
+  (require-package 'pos-tip)
+  (require-package 'company-quickhelp)
+  (company-quickhelp-mode 1)
+
+  
+
+  ; all mode that company-mode should be off will go here
+  ;(add-hook 'py-ipython-shell-mode-hook (lambda ()
+  ;                                        (company-mode -1)
+  ;                                        ))
+
+#+END_SRC
+
+
 * Appearance
 ** Modeline
 #+header: :tangle yes
