@@ -36,12 +36,12 @@ Java has a great supporting tool called =elcim= which extract the
 backend of the Eclipse.  It provides project management, on the fly
 error check and so on.
 
-#+header: :tangle no
+#+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (require-package 'emacs-eclim)
   (require 'eclim)
   (require 'eclimd)
-  (global-eclim-mode)
+;  (global-eclim-mode)
 
   
 
@@ -49,14 +49,14 @@ error check and so on.
   (require 'company)
   (require 'company-emacs-eclim)
   (company-emacs-eclim-setup)
+
 #+END_SRC
 
 ** flycheck integration
 I want flycheck to show eclim-problems. I found [[https://github.com/kleewho/emacs-eclim/blob/flycheck/flycheck-eclim.el][this]] file to do this
 job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
 
-The prerequiresites are flycheck-eclim file and flycheck.
-#+header: :tangle yes
+#+header: :tangle no
 #+BEGIN_SRC emacs-lisp
   (when (and (require 'flycheck)
              (require 'flycheck-eclim))
