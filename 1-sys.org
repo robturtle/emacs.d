@@ -521,6 +521,34 @@ lazier and forgetting lots of basic sentences when getting out of it.
   (define-key yas-minor-mode-map (kbd "M-j") 'yas-expand)
 #+END_SRC
 
+*** helper functions
+**** Java
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (defun yang/get-java-package ()
+      (setq current-dir (file-name-directory (buffer-file-name)))
+      (if (string-match-p "src/main/java/" current-dir)
+          (setq package (substring current-dir
+                                   (+ (string-match "src/main/java/" current-dir)
+                                      (length "src/main/java/"))
+                                   -1))
+        (if (string-match-p "src/" current-dir)
+            (setq package (substring current-dir
+                                     (+ (string-match "src/" current-dir)
+                                        (length "src/"))
+                                     -1))
+          (if (string-match-p "test/" current-dir)
+              (setq package (substring current-dir
+                                       (+ (string-match "test/" current-dir)
+                                          (length "test/"))
+                                       -1))
+            (setq package current-dir))
+          )
+        )
+      (replace-regexp-in-string "/" "." package)
+      )
+#+END_SRC
+
 ** company
 OK, I admitted that I have the tend to use the most latest
 package. That will conflicts the former configuration about this emacs
@@ -548,7 +576,6 @@ configurations.
   ;                                        ))
 
 #+END_SRC
-
 
 * Appearance
 ** Modeline
