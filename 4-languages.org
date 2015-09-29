@@ -57,6 +57,14 @@ error check and so on.
 
 #+END_SRC
 
+** indentation
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'java-mode-hook (lambda ()
+                              (setq c-basic-offset 2
+                                    tab-width 2)))
+#+END_SRC
+
 ** flycheck integration
 I want flycheck to show eclim-problems. I found [[https://github.com/kleewho/emacs-eclim/blob/flycheck/flycheck-eclim.el][this]] file to do this
 job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
