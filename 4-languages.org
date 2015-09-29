@@ -17,10 +17,7 @@ Including CMake plugin and gdb settings.
   (require 'cmake-project)
 
   ;;; TODO enter cmake-project-mode only in CMake project
-  (add-hook 'c++-mode-hook 'cmake-project-mode)
-  (add-hook 'c-mode-hook 'cmake-project-mode)
-  ;(add-hook 'c-mode-common-hook 'ws-butler-mode)
-  ;(add-hook 'c-mode-common-hook 'doxymacs-mode)
+
 
   
   ;;; gdb
