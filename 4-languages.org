@@ -27,6 +27,14 @@ Including CMake plugin and gdb settings.
 
 #+END_SRC
 
+** indentation
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook (lambda ()
+                              (setq c-basic-offset 2
+                                    tab-width 2)))
+#+END_SRC
+
 * Java
 
 Java has a great supporting tool called =elcim= which extract the
