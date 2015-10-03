@@ -1,7 +1,5 @@
 #+TITLE: Editing Utils
 
-* Editing utils
-
 | Key     | Function                |
 |---------+-------------------------|
 | C-c j   | join to previous line   |
@@ -19,7 +17,7 @@
   (global-set-key (kbd "C-x C-.") 'pop-global-mark)
 #+END_SRC
 
-** base config
+* base config
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   ; inverse of fill-paragraph and fill-region
@@ -54,7 +52,7 @@
   (transient-mark-mode t)
 #+END_SRC
 
-** parenthesis =C-M-p/n/u=
+* parenthesis =C-M-p/n/u=
 | C-M-u | backward up |
 | C-M-p | backward    |
 | C-M-n | forward     |
@@ -71,7 +69,7 @@
   (show-paren-mode 1)
 #+END_SRC
 
-*** fix backward to understand quotes, see http://bit.ly/h7mdIL
+** fix backward to understand quotes, see http://bit.ly/h7mdIL
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (defun backward-up-sexp (arg)
@@ -86,7 +84,7 @@
   (global-set-key [remap backward-up-list] 'backward-up-sexp) ; C-M-u C-M-up
 #+END_SRC
 
-** whitespaces
+* whitespaces
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (defun sanityinc/no-trailing-whitespace ()
@@ -131,7 +129,7 @@
   (ws-butler-global-mode)
 #+END_SRC
 
-** indentation
+* indentation
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   ;; So I can auto adjust indentation in foreign files
@@ -139,20 +137,9 @@
   ;(add-hook 'prog-mode-hook 'dtrt-indent-mode)
 #+END_SRC
 
-** newline behaviour =C-o=
+* newline behaviour =C-o=
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "RET") 'newline-and-indent)
-  (defun sanityinc/newline-at-end-of-line ()
-    "Move to end of line, enter a newline, and reindent"
-    (interactive)
-    (move-end-of-line)
-    (newline-and-indent))
-
-  (global-set-key (kbd "S-<return>") 'sanityinc/newline-at-end-of-line)
-
-  
-
   (when (eval-when-compile (string< "24.3.1" emacs-version))
     ;; https://github.com/purcell/emacs.d/issues/138
     (after-load 'subword
@@ -190,14 +177,14 @@
   (global-set-key (kbd "C-o") 'sanityinc/open-line-with-reindent)
 #+END_SRC
 
-** incremental selection =C-==
+* incremental selection =C-==
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (require-package 'expand-region)
   (global-set-key (kbd "C-=") 'er/expand-region)
 #+END_SRC
 
-** whole line or region
+* whole line or region
 If no region selected, run command on current line.
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
@@ -225,7 +212,7 @@ If no region selected, run command on current line.
   (suspend-mode-during-cua-rect-selection 'whole-line-or-region-mode)
 #+END_SRC
 
-** rectangle selection -- CUA =C-ENT=
+* rectangle selection -- CUA =C-ENT=
 
 - enter to cycle through 4 corners
 - =M-n= to insert numbers
@@ -235,7 +222,7 @@ If no region selected, run command on current line.
   (cua-selection-mode t) ; for rectangles, CUA is nice
 #+END_SRC
 
-** shift lines up/down =M-S-up= copy line =C-c y= =C-c Y=
+* shift lines up/down =M-S-up= copy line =C-c y= =C-c Y=
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (require-package 'move-dup)
@@ -248,7 +235,7 @@ If no region selected, run command on current line.
   (global-set-key (kbd "C-c Y") 'md/duplicate-up)
 #+END_SRC
 
-** multiple cursors
+* multiple cursors
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (require-package 'multiple-cursors)
@@ -265,7 +252,7 @@ If no region selected, run command on current line.
   (global-set-key (kbd "C-S-c C-S-a") 'mc/edit-beginnings-of-lines)
 
 #+END_SRC
-** undo-tree: =M-_= redo
+* undo-tree: =M-_= redo
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (require-package 'undo-tree)
@@ -273,7 +260,7 @@ If no region selected, run command on current line.
   (diminish 'undo-tree-mode)
 #+END_SRC
 
-** Zap =M-z= kill till char =M-Z= kill up to char                      :NOTE:
+* Zap =M-z= kill till char =M-Z= kill up to char                      :NOTE:
 | M-z . | kill sentence |
 | M-z > | kill xml tag  |
 
@@ -282,7 +269,7 @@ If no region selected, run command on current line.
   (autoload 'zap-up-to-char "misc" "Kill up to, but not including ARGth occurrence of CHAR.")
   (global-set-key (kbd "M-Z") 'zap-up-to-char)
 #+END_SRC
-** math symbol input
+* math symbol input
 
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
@@ -290,7 +277,7 @@ If no region selected, run command on current line.
   (require 'xah-math-input)
 #+END_SRC
 
-** toggle window spliting
+* toggle window spliting
 In [[http://www.emacswiki.org/emacs/ToggleWindowSplit][the Emacs wiki]] there is a function to toggle window between vertical
 and horizontal splitting.  This is useful especially when your screen
 is too large that the =helm= always split your window horizontally.
@@ -312,7 +299,7 @@ is too large that the =helm= always split your window horizontally.
   (define-key ctl-x-4-map "t" 'toggle-frame-split)
 #+END_SRC
 
-** snippets
+* snippets
 I don't want to repeat again and again that how important and life
 changing this facility is.  In fact it's so good that make a programmer
 lazier and forgetting lots of basic sentences when getting out of it.
@@ -352,8 +339,8 @@ lazier and forgetting lots of basic sentences when getting out of it.
   (define-key yas-minor-mode-map (kbd "M-j") 'yas-expand)
 #+END_SRC
 
-*** helper functions
-**** Java
+** helper functions
+*** Java
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (defun yang/get-java-package ()
@@ -380,7 +367,7 @@ lazier and forgetting lots of basic sentences when getting out of it.
       ))
 #+END_SRC
 
-** auto completion - company
+* auto completion - company
 OK, I admitted that I have the tend to use the most latest
 package. That will conflicts the former configuration about this emacs
 configurations.
@@ -408,7 +395,7 @@ configurations.
 
 #+END_SRC
 
-** ace-jump - cursor navigating =C-;= =C-:=
+* ace-jump - cursor navigating =C-;= =C-:=
 Use ace-jump to control the exact move of the cursor
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
