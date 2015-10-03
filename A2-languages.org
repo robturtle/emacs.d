@@ -263,7 +263,6 @@ FIXME: Currently it seems not work with flycheck, I'll fix it later.
     (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code)))
 #+END_SRC
 
-
 * Ruby
 
 | Key  | Function            |

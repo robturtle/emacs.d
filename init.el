@@ -3,6 +3,10 @@
 ;; This file loads Org-mode and then loads the rest of our Emacs initialization from Emacs lisp
 ;; embedded in literate Org-mode files.
 
+;; ;; prerequisites
+;; directory for manually installed packages
+(shell-command "[[ -d \"${HOME}/.emacs.d/site-lisp\" ]] || mkdir ${HOME}/.emacs.d/site-lisp")
+
 ;; Load up Org Mode and (now included) Org Babel for elisp embedded in Org Mode files
 (setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
 
@@ -22,6 +26,7 @@
 
 ;; store customized code other file
 (setq custom-file "~/.emacs.d/.custom.el")
-(load custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 ;;; init.el ends here
