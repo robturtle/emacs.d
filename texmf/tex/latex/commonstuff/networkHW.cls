@@ -7,6 +7,7 @@
 % you probably need to load a standard class settings first
 \LoadClass[letterpaper, 12pt]{report}
 \renewcommand{\thesection}{\arabic{section}} % make section # starts with '1' but not '0.1'
+\setlength{\parindent}{0cm}
 
 %% your customization starts from here
 % use \begin{lstlisting} instead of #+BEGIN_EXAMPLE for command line demo/outputs
@@ -22,7 +23,6 @@
       breaklines=true, % wrap long lines
       columns=fullflexible,
       #1}
-    \renewcommand{\lstlistingname}{Packet}
   }
   {\endminipage}
 
