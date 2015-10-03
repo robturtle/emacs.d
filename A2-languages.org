@@ -1,5 +1,4 @@
 #+title: Languages Support
-
 * C/C++ common
 Including CMake plugin and gdb settings.
 
@@ -77,6 +76,54 @@ job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
 #+END_SRC
 
 * Python
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'python-mode)
+  (require 'python-mode)
+
+  ;; Emacs ipython notebook
+  (require-package 'ein)
+  (require 'ein)
+
+  (require-package 'pydoc-info)
+  (require 'pydoc-info)
+#+END_SRC
+
+** pass argument to run =C-C C-A=
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (defun python-send-buffer-with-my-args (args)
+    (interactive "sPython arguments: ")
+    (let ((source-buffer (current-buffer)))
+      (with-temp-buffer
+        (insert "import sys; sys.argv = '''" args "'''.split()\n")
+        (insert-buffer-substring source-buffer)
+        (py-execute-buffer))))
+
+  ;; execute the buffer with arguments provided (good for clients)
+  (define-key python-mode-map "\C-c\C-a" 'python-send-buffer-with-my-args)
+  ;; execute the buffer in a new python shell (good for servers)
+  (define-key python-mode-map (kbd "C-c C-S-c") 'py-execute-buffer-dedicated)
+#+END_SRC
+
+** company
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'company-jedi)
+
+  (add-to-list 'company-backends 'company-jedi)
+#+END_SRC
+
+** misc
+Set python mode for [[http://www.scons.org/][scons]] -- a build system.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-auto-mode 'python-mode "SConstruct\\'" "SConscript\\'")
+  
+  ;; support editing pip requirements files
+  (require-package 'pip-requirements)
+#+END_SRC
 
 * Haskell
 
@@ -107,36 +154,34 @@ FIXME: Currently it seems not work with flycheck, I'll fix it later.
 
 ** Syntax check
 
-*NOTE* this depends on [[file:3-sematics.org::*flycheck][flycheck]]. Make sure the flycheck is set up
-properly.
-
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   (when (and (maybe-require-package 'flycheck-haskell)
              (require-package 'flycheck-hdevtools))
     (after-load 'flycheck
-                (add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
+      (add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
 
-                (defun sanityinc/flycheck-haskell-reconfigure ()
-                  "Reconfigure flycheck haskell settings, e.g. after changing cabal file."
-                  (interactive)
-                  (unless (eq major-mode 'haskell-mode)
-                    (error "Expected to be in haskell-mode"))
-                  (flycheck-haskell-clear-config-cache)
-                  (flycheck-haskell-configure)
-                  (flycheck-mode -1)
-                  (flycheck-mode))
+      (defun sanityinc/flycheck-haskell-reconfigure ()
+        "Reconfigure flycheck haskell settings, e.g. after changing cabal file."
+        (interactive)
+        (unless (eq major-mode 'haskell-mode)
+          (error "Expected to be in haskell-mode"))
+        (flycheck-haskell-clear-config-cache)
+        (flycheck-haskell-configure)
+        (flycheck-mode -1)
+        (flycheck-mode))
 
-                (defadvice haskell-mode-stylish-buffer (around skip-if-flycheck-errors activate)
-                  "Don't run stylish-buffer if the buffer appears to have a syntax error.
+      (defadvice haskell-mode-stylish-buffer (around skip-if-flycheck-errors activate)
+        "Don't run stylish-buffer if the buffer appears to have a syntax error.
   This isn't a hard guarantee, since flycheck might sometimes not run until the file has
   been saved."
-                  (unless (flycheck-has-current-errors-p 'error)
-                    ad-do-it))
+        (unless (flycheck-has-current-errors-p 'error)
+          ad-do-it))
 
-                (require 'flycheck-hdevtools)))
+      (require 'flycheck-hdevtools)))
 
 #+END_SRC
+
 ** Documentations
 
 #+header: :tangle yes
@@ -153,20 +198,12 @@ properly.
 
 ** Interaction
 
-Require diminish.el
-
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
-  (require-package 'diminish)
-  (require 'diminish)
   (after-load 'haskell
     (diminish 'interactive-haskell-mode " IntHS"))
 
   (add-auto-mode 'haskell-mode "\\.ghci\\'")
-
-  (when (maybe-require-package 'ghci-completion)
-    (add-hook 'inferior-haskell-mode-hook 'turn-on-ghci-completion))
-
 #+END_SRC
 
 ** Indentation
@@ -211,6 +248,21 @@ Require diminish.el
        'compilation-error-regexp-alist alias)))
 
 #+END_SRC
+
+** Autocompletion - company
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; setup ghc first
+  (require-package 'ghc)
+  (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+
+  
+  (when (require 'company)
+    (require-package 'company-ghc)
+    (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code)))
+#+END_SRC
+
 
 * Ruby
 
