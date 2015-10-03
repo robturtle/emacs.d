@@ -14,3 +14,5 @@ projectile.cache
 projectile-bookmarks.eld
 *.png
 snippets/
+0-*.el
+0-*.org
