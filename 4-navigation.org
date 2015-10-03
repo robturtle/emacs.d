@@ -1,0 +1,613 @@
+#+TITLE: Navigation through resources
+
+* [[http://tuhdo.github.io/helm-intro.html][Helm]]
+=Helm= is a much more visualized navigation than =ido=.  It contains
+many functions and site-packages.  First of all, the base package is
+necessary.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;; helm
+(require-package 'helm)
+(require 'helm-config)
+#+END_SRC
+
+** Setup
+
+=helm= will play as my default navigation system everywhere in the
+Emacs.
+
+Starts helm.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (helm-mode 1)
+
+#+END_SRC
+
+Config about helm's behaviors.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages) ; So I can get man under cursor
+
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t)
+#+END_SRC
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (helm-autoresize-mode 1) ; make helm buffer auto adjust its size according to its contents
+  ;; fuzzy match is great
+  (setq helm-recentf-fuzzy-match          t
+        helm-buffers-fuzzy-matching       t
+        helm-M-x-fuzzy-match              t
+  ;     helm-locate-fuzzy-match           t ; don't set it because it only works on Linux
+        helm-semantic-fuzzy-match         t
+        helm-imenu-fuzzy-match            t
+        helm-apropos-fuzzy-match          t
+        helm-lisp-fuzzy-completion        t)
+#+END_SRC
+
+Set up helm global key:
+
+| Key     | Function                       |
+|---------+--------------------------------|
+| C-c h   | helm prefix                    |
+| M-x     | helm-M-x                       |
+| C-x C-f | show file system               |
+| C-c M   | search man manual at the point |
+| C-x b   | show buffers                   |
+| M-y     | show kill ring                 |
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+  ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+  ;; cannot cahnge `helm-command-prefix-key' once `helm-config' is loaded
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
+
+  ;; replace the default functions on Emacs
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x b") 'helm-mini)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+  ;; swap the functio of `TAB' and `C-z'
+  ;; Now `TAB' will not quit the helm session after the action ran
+  ;; while `C-z' does
+  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+#+END_SRC
+
+** Basic Usage
+Browsing:
+    - type one or more words for search, keywords are separated by =SPC=
+    - expand path name with =C-j=, go to parent directory with =C-l=
+    - mark a candidate with =C-SPC=
+    - insert candidate into buffer with =C-c C-i=
+    - toggle horizontal/vertical layout =C-t=
+    - open in other window =C-c o=
+
+
+*NOTE* that never use =TAB= to complete path again.
+
+Commands:
+    - use =TAB= to run persistent action on marked candidates.  It will not quit
+      the helm session.  Normally it's used to preview the file.
+    - use =C-z= to run action on marked candidates.  It will quit the
+      helm session.
+
+*** M-x
+     - =TAB= will display the document on other window
+
+*** helm-show-kill-ring =M-y=
+I can interactive select my kill ring now!  Replace this with the
+default Emacs kill ring.
+
+*** helm-mini =C-x b=
+     - filter by major mode wieh =*= and =*!=.  For example: =*java=, =*!dired=
+       - multiple filters separated by ',', e.g. =*!lisp,!sh,!fun=
+     - filter by folder with =/= and =!/=.  For example =/emacs.d/=, =!/.git/=
+     - filter by contents with =@=
+       - if you want to see the location of the strings. use =M-a C-s=
+         to search
+       - if you want to search in one file without canceling
+         candidates' marks, use =C-u C-s=
+       - =C-u C-s= is also used to search recursively
+
+*** helm-semantic-or-imenu - Outline View =i=
+
+If =semantic-mode= is enabled, use =semantic= to generate tags,
+otherwise =imenu=. When doing it on a C/C++ file, and your cursor on a
+header file, persistent action (i.e. =TAB= in my setting) will preview
+that file on other window.
+
+Filter the tags (e.g. functions, variables), enter =^f= for functions.
+
+*** helm-find =/=
+
+If you search on a huge directory and feel the update is slow, use
+=C-!= to close the live updating feature.
+
+     - toggle candidates to =helm-find-file= by =RET=
+     - you can use =helm-find= in =helm-find-file= by =C-c /=
+
+
+The issue is I seems can't change the searching directory in file
+buffers.  I can only sucessfully change the directory in a dired
+buffer.  And it cannot find the backup file like =example.txt~=.
+
+*** helm-locate =l=
+
+It should be much faster than =helm-find=.  And it accepts search
+patterns.  I should use this more often.
+
+*** helm-occur =o=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; fasten some helm invoking
+  (global-set-key (kbd "C-c h o") 'helm-occur)
+
+#+END_SRC
+
+It's better than the default =I-search= function on Emacs.  I can use
+this instead of =I-search= in most cases.
+
+*** helm-apropos =a=
+
+Pre-configured helm to describe /commands, functions, variables and
+faces/ - all in one command!  A good way to search elisp documentaion.
+
+*** helm-info =h=
+
+| Key | Binding            |
+|-----+--------------------|
+| h g | helm-info-gnus     |
+| h i | helm-info-at-point |
+| h r | helm-info-emacs    |
+
+*** helm-lisp-completion-at-point =TAB=
+
+It will popup a list for you to select.  A good way to explore the
+API.
+
+*** helm-resume =b=
+
+A very useful command!
+
+*** helm-all-mark-ring =C-h SPC=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
+#+END_SRC
+
+*** helm-regexp =r=
+
+A useful command to test regexp interactively.  Following actions are
+available if =C-z=:
+
+| Key | Action                                                    |
+|-----+-----------------------------------------------------------|
+| F1  | Saves the regexp as a string in =kill-ring=               |
+| F2  | Invoke =query-replace= with current regexp to be replaced |
+| F3  | Saves the regexp as in the current Helm prompt            |
+
+*** helm-register =x=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h x") 'helm-register)
+#+END_SRC
+
+Viewing Emacs registers.
+
+| Key | Action                                                               |
+|-----+----------------------------------------------------------------------|
+| F1  | Insert register content into buffer                                  |
+| F2  | Append an active region to current content in highlighting register  |
+| F3  | Prepend an active region to current content in highlighting register |
+
+*** helm-top =t=
+
+| Key     | Binding                |
+|---------+------------------------|
+| F1      | KILL - SIGTERM         |
+| F2      | KILL - SIGKILL         |
+| F3      | KILL - SIGINT          |
+| F4      | KILL - Chose signal    |
+| C-c C-u | Refresh                |
+| M-C     | Sort by shell commands |
+| M-P     | Sort by CPU usage      |
+| M-U     | Sort by user           |
+| M-M     | Sort by memory         |
+
+*** helm-surfraw - internet search =s=
+
+Before I can use this function, I have to solve the GFW problem
+first.  And the command line program =surfraw= must be installed.
+
+*** helm-google-suggest =g=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h g") 'helm-google-suggest)
+#+END_SRC
+
+I have to deal with the GFW problem before using it.
+
+*** helm-color =c=
+
+If you want to quickly view and copy hexadecimal values of colors,
+helm-color provides such features. But, helm-color is beyond a mere
+color picker. The real usage for helm-color is for face customization:
+the command list ALL available faces, with a preview of each face in
+the same row. This makes theme customization really quick because you
+can quickly view a face with its color. Because the way Helm work, you
+can look at a group of faces together to have a global view if the
+colors work well with each other.
+
+helm-color contains two groups, with actions in each:
+
+Colors:
+| Key        | Action      |
+|------------+-------------|
+| F1 / C-c N | Copy Name   |
+| F2 / C-c R | Copy RGB    |
+| F3 / C-c n | Insert name |
+| F4 / C-c r | Insert RGB  |
+
+Customize face:
+| Key | Action                    |
+|-----+---------------------------|
+| F1  | Open Customization window |
+| F2  | Copy face name            |
+
+*** helm-eval-expression-with-eldoc =M-:=
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c h M-:") 'helm-eval-expression-with-eldoc)
+#+END_SRC
+
+This command allows you to enter Emacs Lisp expressions and get
+instant result in a Helm buffer for every character you type. The
+changed key binding above makes it easier to remember, since the stock
+eval-expression binds to M-:. So, from now on, to eval expression
+without live update, use M-:, and with live update, use C-c h
+M-:. This command is useful when you want to try out a command with
+various inputs, and want to see result as fast as possible.
+
+*** helm-calcul-expression =C-comma=
+A handful calculator.
+** [[http://tuhdo.github.io/helm-intro.html#sec-28][helm-eshell-history]] =C-c C-l=
+
+Use =C-c C-l= to explore eshell history.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-eshell)
+
+  (add-hook 'eshell-mode-hook
+            #'(lambda ()
+                (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
+
+#+END_SRC
+
+** [[http://localhost:8080/Emacs/Exploring%2520large%2520projects%2520with%2520Projectile%2520and%2520Helm%2520Projectile.html][Helm Projectile]]
+*** [[http://tuhdo.github.io/helm-intro.html#sec-31][Setup]]
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'projectile)
+  (require-package 'helm-projectile)
+  (require 'projectile)
+  (require 'helm-projectile)
+  (projectile-global-mode)
+  (helm-projectile-on)
+
+#+END_SRC
+
+Currently the =projectile= auto treats =git=, =mercurial=, =darcs= and
+=bazaar= repository as a project.  If you want to mark a folder as a
+project just create an empty *.projectile* file in it.  Some of
+=projectile= features:
+
+  - jump to a file in project
+  - jump to files at point in project
+  - jump to a directory in project
+  - jump to a file in a directory
+  - jump to a project buffer
+  - jump to a test in project
+  - toggle between files with same names but different extensions
+    (e.g. =.h= <-> =.c/.cpp=, =Genfile= <-> =Genfile.lock=)
+  - toggle between code and its test
+  - jump to recently visited files in the project
+  - switch between projects you have worked on
+  - kill all project buffers
+  - replace in project
+  - multi-occur in project buffers
+  - grep in project
+  - regenerate project etags or gtags (require =ggtags=)
+  - visit project in dired
+  - run make in a project with a single key chord
+
+**** mode-line
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))
+#+END_SRC
+
+*** Usage
+
+| Key       | Function                                                     | Remarks                                         |
+|-----------+--------------------------------------------------------------+-------------------------------------------------|
+| C-c p C-h | help                                                         |                                                 |
+| C-c p p   | swithcing projects                                           | With =C-u= prefix it will clear the cache first |
+| C-c p f   | find file in current project                                 | Use =C-c p 4 f= to open in other window         |
+| C-c p F   | find file in all known projects                              |                                                 |
+| C-c p g   | find file at the point in current project                    |                                                 |
+| C-c p d   | switch to dired in current project                           | With =C-u= prefix it will clear the cache first |
+| C-c p a   | switch to same-name file with differ extension               |                                                 |
+| C-c p T   | find test file in current project                            |                                                 |
+| C-c p l   | find file in current directory                               |                                                 |
+| C-c p s g | multi-occur in current project                               | g for =gnu=; a for =ack=; s for =ag=            |
+| C-c p r   | query-replace in current project                             |                                                 |
+| C-c p D   | open root project                                            |                                                 |
+| C-c p !   | runs =shell-command= in root of project                      |                                                 |
+| C-c p &   | runs =async-shell-command= in root of project                |                                                 |
+| C-c p c   | runs a standard compilation command for your type of project |                                                 |
+| C-c p P   | runs a standard test command for yor type of project         |                                                 |
+| C-c p t   | toggle between implementation and its test file              | Use =C-c p 4 t= to open in other window         |
+| C-c p k   | kills all project buffer                                     |                                                 |
+| C-c p S   | save all project buffers                                     |                                                 |
+| C-c p ESC | switch to most recently selected projectile buffer           |                                                 |
+
+Useful Helm actions
+| Key   | Function                |
+|-------+-------------------------|
+| C-c @ | insert as an Org link   |
+| M-S   | symlink files           |
+|-------+-------------------------|
+| C-=   | ediff file              |
+| C-c = | emerge file             |
+| M-.   | etags                   |
+| M-e   | switch to eshell        |
+| M-!   | eshell command on files |
+| C-c p | print marked files      |
+
+Some other not-that-common-used commands
+| Key       | Function                                                           |
+|-----------+--------------------------------------------------------------------|
+| C-c p e   | find recently visited files                                        |
+| C-c p i   | invalidates the project cache                                      |
+| C-c p R   | regenerates project TAGS file                                      |
+| C-c p j   | find tag in TAGS file                                              |
+| C-c p z   | add current file to cache                                          |
+| C-c p m   | run the commander (an interface to run commands with a single key) |
+
+*** Switching projects =C-c p p=
+
+The action after switched project is optional:
+
+  - =projectile-find-file=: it will continue to ask for a file to
+    visit
+  - =projectile-find-file-in-known-projects=: it will lists all known
+    projects' files
+  - =projectile-find-file-dwim=: it will tries to search path at the
+    point first
+  - =projectile-dired=: it will open top-level directory
+  - =projectile-find-dir=: it will continue to ask for a directory to
+    visit
+
+Currently this setting is not settled.  I will have to try this
+workflow a little bit to confirm the best choice.  I think to let this
+command to open a directory is better cause there are other commands
+to open projectile files.  So I can switch to a project, explore its
+file system for a while, and open one or more specific file(s) then.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (setq projectile-switch-project-action 'projectile-dired)
+
+  ;; make `find-dir' includes function of `projectile-dired'
+  (setq projectile-find-dir-includes-top-level t)
+#+END_SRC
+
+*** Ignoring files
+
+If you like to make =projectile= ignore certain files, edit your
+=.projectile= file.  Every path is relative to the root directory and
+start with a slash.  Every pattern is not start with a slash.  Here is
+the example from the [[https://github.com/bbatsov/projectile][projectile github page]].
+
+#+BEGIN_EXAMPLE
+-/log
+-/tmp
+-/vendor
+-/public/uploads
+
+-tmp
+-*.rb
+-*.yml
+-models
+#+END_EXAMPLE
+
+Or you can ignore everything except certain subdirectories:
+
+#+BEGIN_EXAMPLE
++/src/foo
++/tests/foo
+#+END_EXAMPLE
+
+Patterns do not support this syntax.
+
+*** Local varible
+
+See [[https://github.com/bbatsov/projectile#storing-project-settings][here]].
+
+*** [[http://tuhdo.github.io/helm-projectile.html#sec-7][Virtual directory]]
+
+You can create a virtual directory to store a group of files from
+anywhere.
+
+The according Helm commands:
+| Key   | Function                                    |
+|-------+---------------------------------------------|
+| C-c f | create virtual dired buffer from candidates |
+| C-c a | add files to dired buffer                   |
+| C-c d | remove files from dired buffer              |
+
+After created, you can store it with [[*bookmark+][bookmark]] with 'C-x p m`.
+
+** helm-descbinds =C-h b=
+
+Explore all the bindings.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'helm-descbinds)
+  (require 'helm-descbinds)
+  (helm-descbinds-mode)
+#+END_SRC
+** helm-gtags
+=helm-gtags= is a helm interface for =GNU Global=.  The author
+recommanded the following configuration:
+
+#+header: :tangle no
+#+BEGIN_SRC emacs-lisp
+  ;; Enable helm-gtags-mode
+      (add-hook 'c-mode-hook 'helm-gtags-mode)
+      (add-hook 'c++-mode-hook 'helm-gtags-mode)
+      (add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+      ;; Set key bindings
+      (eval-after-load "helm-gtags"
+        '(progn
+           (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-find-tag)
+           (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
+           (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
+           (define-key helm-gtags-mode-map (kbd "M-g M-p") 'helm-gtags-parse-file)
+           (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+           (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+           (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)))
+#+END_SRC
+
+Purcell used the following configuration:
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-use-input-at-cursor t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-prefix-key "\C-cg"
+ helm-gtags-suggested-key-mapping t
+ )
+(require-package 'helm-gtags)
+(require 'helm-gtags)
+;; Enable helm-gtags-mode
+(add-hook 'dired-mode-hook 'helm-gtags-mode)
+(add-hook 'eshell-mode-hook 'helm-gtags-mode)
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
+(eval-after-load "helm-tags"
+  '(progn
+    (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+    (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+    (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+    (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+    (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+    (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)))
+
+#+END_SRC
+
+* bookmark+
+** Basic bookmark usage
+
+| Key               | Function                  |
+|-------------------+---------------------------|
+| C-x r m           | set bookmark at the point |
+| C-x r b           | jump to the bookmark      |
+| C-x r l           | list all bookmarks        |
+| M-x bookmark-save | save all bookmarks        |
+
+** bookmark+ usage
+| Key         | Function                                  |
+|-------------+-------------------------------------------|
+| C-x p m     | set bookmark for file                     |
+| C-x j j     | jump to bookmark                          |
+| C-x 4 j j   | jump other window                         |
+| C-x p t + a | tag a file (creates an autofile bookmark) |
+| C-x p e     | list bookmarks                            |
+
+Specified mode:
+| Key      | Function                     |
+|----------+------------------------------|
+| C-x j j  | normal jump                  |
+| C-x j d  | dired                        |
+| C-x j i  | info                         |
+| C-x j ,, | in current buffer            |
+| C-x p ,  | bookmark list current buffer |
+| C-x j t  | tag                          |
+
+'C-x j t`:
+| key | Function               |
+|-----+------------------------|
+| %   | prefix of using regexp |
+| +/* | exists/all             |
+
+#+BEGIN_EXAMPLE
+C-x j t % +
+# jump to bookmark have one/more tags matches the regexp
+C-x j t f % *
+# jump to file bookmark have all tags matches the regexpe
+#+END_EXAMPLE
+
+Keys used in bookmark list:
+| Key     | Function                                                                        |
+|---------+---------------------------------------------------------------------------------|
+| T +/-   | add/remove some tags                                                            |
+| T m +   | mark the bookmarks that have particular tags. Hit 'RET` for every tag you type. |
+| U       | Unmark all bookmarks                                                            |
+| t       | toggle marked/unmarked bookmarks                                                |
+| M-d >   | dired the marked bookmarks                                                      |
+| [c-u] a | (edit)/show annotation                                                          |
+| r       | rename                                                                          |
+| e       | edit all bookmark info                                                          |
+| E       | edit all marked bookmarks                                                       |
+
+Kyes used in Dired buffer:
+| Key     | Function                          |
+|---------+-----------------------------------|
+| C-x r m | bookmark the dired directory      |
+| M-b     | bookmark each of the marked files |
+
+** Setup
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'bookmark+)
+  (require 'bookmark+)
+#+END_SRC
+
+** Extensions
+
+FIXME: requrie 'dired+.el` and 'highlight.el`. Fix it later
+
+After installed. use 'M-b` to autofile bookmark marked files.
+* command navigation
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'guide-key)
+  (setq guide-key/guide-key-sequence '("C-x" "C-c" "C-x 4" "C-x 5" "C-c ;" "C-c ; f" "C-c ' f" "C-x n" "C-c h" "C-c p"))
+  (guide-key-mode 1)
+  (diminish 'guide-key-mode)
+#+END_SRC

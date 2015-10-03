@@ -76,6 +76,8 @@ job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
     (flycheck-eclim-setup))
 #+END_SRC
 
+* Python
+
 * Haskell
 
 | Key   | Function                       |

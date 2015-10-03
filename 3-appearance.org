@@ -1,0 +1,302 @@
+#+TITLE: Appearance
+
+* Modeline
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'smart-mode-line)
+  (require-package 'smart-mode-line-powerline-theme)
+  ;(setq sml/theme 'powerline)
+  (require 'smart-mode-line)
+  (add-hook 'after-init-hook 'sml/setup)
+#+END_SRC
+* Color theme
+
+Switches: =M-x dark= and =M-x light=
+
+NOTE: at the first time you've installed the color theme, use at least
+once =M-x dark= to mark both light and dark color theme as safe.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+(when (< emacs-major-version 24)
+  (require-package 'color-theme))
+
+(require-package 'color-theme-sanityinc-solarized)
+(require-package 'color-theme-sanityinc-tomorrow)
+
+;;------------------------------------------------------------------------------
+;; Old-style color theming support (via color-theme.el)
+;;------------------------------------------------------------------------------
+(defcustom window-system-color-theme 'color-theme-sanityinc-solarized-dark
+  "Color theme to use in window-system frames.
+If Emacs' native theme support is available, this setting is
+ignored: use `custom-enabled-themes' instead."
+  :type 'symbol)
+
+(defcustom tty-color-theme 'color-theme-terminal
+  "Color theme to use in TTY frames.
+If Emacs' native theme support is available, this setting is
+ignored: use `custom-enabled-themes' instead."
+  :type 'symbol)
+
+(unless (boundp 'custom-enabled-themes)
+  (defun color-theme-terminal ()
+    (interactive)
+    (color-theme-sanityinc-solarized-dark))
+
+  (defun apply-best-color-theme-for-frame-type (frame)
+    (with-selected-frame frame
+      (funcall (if window-system
+                   window-system-color-theme
+                 tty-color-theme))))
+
+  (defun reapply-color-themes ()
+    (interactive)
+    (mapcar 'apply-best-color-theme-for-frame-type (frame-list)))
+
+  (set-variable 'color-theme-is-global nil)
+  (add-hook 'after-make-frame-functions 'apply-best-color-theme-for-frame-type)
+  (add-hook 'after-init-hook 'reapply-color-themes)
+  (apply-best-color-theme-for-frame-type (selected-frame)))
+
+
+;;------------------------------------------------------------------------------
+;; New-style theme support, in which per-frame theming is not possible
+;;------------------------------------------------------------------------------
+
+;; If you don't customize it, this is the theme you get.
+(setq-default custom-enabled-themes '(sanityinc-solarized-light))
+
+;; Ensure that themes will be applied even if they have not been customized
+(defun reapply-themes ()
+  "Forcibly load the themes listed in `custom-enabled-themes'."
+  (dolist (theme custom-enabled-themes)
+    (unless (custom-theme-p theme)
+      (load-theme theme)))
+  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes))))
+
+(add-hook 'after-init-hook 'reapply-themes)
+
+
+;;------------------------------------------------------------------------------
+;; Toggle between light and dark
+;;------------------------------------------------------------------------------
+(defun light ()
+  "Activate a light color theme."
+  (interactive)
+  (color-theme-sanityinc-solarized-light))
+
+(defun dark ()
+  "Activate a dark color theme."
+  (interactive)
+  (color-theme-sanityinc-solarized-dark))
+
+#+END_SRC
+
+* GUI features (tune transparency)				  :keys:NOTE:
+
+Most of the GUI features are supressed.  And add shorcuts to adjust
+fullscreen or opacity.
+
+| Key   | Function                    |
+|-------+-----------------------------|
+| M-s-f | toggle full screen          |
+| M-C-8 | make emacs more transparent |
+| M-C-9 | make emacs less transparent |
+| M-C-0 | make emacs not  transparent |
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;;----------------------------------------------------------------------------
+;; Stop C-z from minimizing windows under OS X
+;;----------------------------------------------------------------------------
+;;;; Yang: I need the suspend shortcut
+;; (defun maybe-suspend-frame ()
+;;   (interactive)
+;;   (unless (and *is-a-mac* window-system)
+;;     (suspend-frame)))
+
+;; (global-set-key (kbd "C-z") 'maybe-suspend-frame)
+
+
+;;----------------------------------------------------------------------------
+;; Suppress GUI features
+;;----------------------------------------------------------------------------
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+
+
+;;----------------------------------------------------------------------------
+;; Show a marker in the left fringe for lines not in the buffer
+;;----------------------------------------------------------------------------
+(setq indicate-empty-lines t) ; indicate TRAILING empty lines
+
+
+;;----------------------------------------------------------------------------
+;; Window size and features
+;;----------------------------------------------------------------------------
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'set-scroll-bar-mode)
+  (set-scroll-bar-mode nil))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+
+(let ((no-border '(internal-border-width . 0)))
+  (add-to-list 'default-frame-alist no-border)
+  (add-to-list 'initial-frame-alist no-border))
+
+(defun sanityinc/adjust-opacity (frame incr)
+  (let* ((oldalpha (or (frame-parameter frame 'alpha) 100))
+         (newalpha (+ incr oldalpha)))
+    (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
+      (modify-frame-parameters frame (list (cons 'alpha newalpha))))))
+
+ (when (and *is-a-mac* (fboundp 'toggle-frame-fullscreen))
+   ;; Command-Option-f to toggle fullscreen mode
+   ;; Hint: Customize `ns-use-native-fullscreen'
+   (global-set-key (kbd "M-s-f") 'toggle-frame-fullscreen))
+
+ (global-set-key (kbd "M-C-8") (lambda () (interactive) (sanityinc/adjust-opacity nil -2)))
+ (global-set-key (kbd "M-C-9") (lambda () (interactive) (sanityinc/adjust-opacity nil 2)))
+ (global-set-key (kbd "M-C-0") (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
+
+
+;;;; I just totally shut down the menu-bar-mode
+;; (add-hook 'after-make-frame-functions
+;;           (lambda (frame)
+;;             (with-selected-frame frame
+;;               (unless window-system
+;;                 (set-frame-parameter nil 'menu-bar-lines 0)))))
+
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
+
+;; Non-zero values for `line-spacing' can mess up ansi-term and co,
+;; so we zero it explicitly in those cases.
+(add-hook 'term-mode-hook
+          (lambda ()
+            (setq line-spacing 0)))
+
+#+END_SRC
+
+* replace symbols with pretty unicode
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (when (fboundp 'global-prettify-symbols-mode)
+    (global-prettify-symbols-mode))
+#+END_SRC
+
+* highlight same symbols
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'highlight-symbol)
+  (dolist (hook '(prog-mode-hook html-mode-hook css-mode-hook))
+    (add-hook hook 'highlight-symbol-mode)
+    (add-hook hook 'highlight-symbol-nav-mode))
+  (eval-after-load 'highlight-symbol
+    '(diminish 'highlight-symbol-mode))
+#+END_SRC
+
+* highlight indentation
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'highlight-indentation)
+  (require 'highlight-indentation)
+  (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+#+END_SRC
+* hightlight escape sequences
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'highlight-escape-sequences)
+  (hes-mode)
+#+END_SRC
+
+* show page break lines
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'page-break-lines)
+  (global-page-break-lines-mode)
+  (diminish 'page-break-lines-mode)
+
+#+END_SRC
+
+* show 80 char width indicator
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (when (eval-when-compile (> emacs-major-version 23))
+    (require-package 'fill-column-indicator)
+    (defun sanityinc/prog-mode-fci-settings ()
+      (turn-on-fci-mode)
+      (when show-trailing-whitespace
+        (set (make-local-variable 'whitespace-style) '(face trailing))
+        (whitespace-mode 1)))
+
+    (add-hook 'prog-mode-hook 'sanityinc/prog-mode-fci-settings)
+
+    (defun sanityinc/fci-enabled-p ()
+      (and (boundp 'fci-mode) fci-mode))
+
+    (defvar sanityinc/fci-mode-suppressed nil)
+    (defadvice popup-create (before suppress-fci-mode activate)
+      "Suspend fci-mode while popups are visible"
+      (let ((fci-enabled (sanityinc/fci-enabled-p)))
+        (when fci-enabled
+          (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-enabled)
+          (turn-off-fci-mode))))
+    (defadvice popup-delete (after restore-fci-mode activate)
+      "Restore fci-mode when all popups have closed"
+      (when (and sanityinc/fci-mode-suppressed
+                 (null popup-instances))
+        (setq sanityinc/fci-mode-suppressed nil)
+        (turn-on-fci-mode)))
+
+    ;; Regenerate fci-mode file images after switching themes
+    (defadvice enable-theme (after recompute-fci-face activate)
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (when (sanityinc/fci-enabled-p)
+            (turn-on-fci-mode))))))
+#+END_SRC
+
+* hide show - code folding
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-SPC") 'hs-toggle-hiding)
+  (add-hook 'python-mode-hook 'hs-minor-mode)
+  (add-hook 'c-mode-common-hook 'hs-minor-mode)
+  (add-hook 'c-mode-common-hook   'hs-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+  (add-hook 'java-mode-hook       'hs-minor-mode)
+  (add-hook 'lisp-mode-hook       'hs-minor-mode)
+  (add-hook 'perl-mode-hook       'hs-minor-mode)
+  (add-hook 'sh-mode-hook         'hs-minor-mode)
+  (add-hook 'org-mode-hook         'hs-minor-mode)
+
+  
+
+  ;; display the overlay content in a tooltip
+  (defun display-code-line-counts (ov)
+    (when (eq 'code (overlay-get ov 'hs))
+      (overlay-put ov 'help-echo
+                   (buffer-substring (overlay-start ov)
+                                     (overlay-end ov)))))
+
+  (setq hs-set-up-overlay 'display-code-line-counts)
+#+END_SRC
+
+** Special blocks
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'hs-special-modes-alist
+                   '(org-mode
+                     "\\\\begin" ;; regexp for start block
+                     "\\\\end"   ;; regexp for end block
+                     "%"         ;; regexp for comment start
+                     (lambda (arg)(search-forward "\\end"))
+                     nil))
+#+END_SRC
