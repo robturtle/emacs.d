@@ -26,6 +26,14 @@ check and auto-completion.
 
 #+END_SRC
 
+** shorcuts
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-c\C-n" 'flycheck-next-error)
+  (global-set-key "\C-c\C-p" 'flycheck-previous-error)
+#+END_SRC
+
 ** show popup error & support eclim errors
 
 I installed this mainly because it can show eclim's errors;
