@@ -78,8 +78,8 @@ job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
 * Python
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
-  (require-package 'python-mode)
-  (require 'python-mode)
+  ;;(require-package 'python-mode)
+  ;;(require 'python-mode)
 
   ;; Emacs ipython notebook
   (require-package 'ein)
@@ -98,12 +98,13 @@ job for me.  I put this into ~/.emacs.d/emacs-eclim... folder.
       (with-temp-buffer
         (insert "import sys; sys.argv = '''" args "'''.split()\n")
         (insert-buffer-substring source-buffer)
-        (py-execute-buffer))))
+        (python-shell-send-buffer))))
 
   ;; execute the buffer with arguments provided (good for clients)
-  (define-key python-mode-map "\C-c\C-a" 'python-send-buffer-with-my-args)
+  ;;(define-key python-mode-map "\C-c\C-a" 'python-send-buffer-with-my-args)
+  (global-set-key "\C-c\C-a" 'python-send-buffer-with-my-args)
   ;; execute the buffer in a new python shell (good for servers)
-  (define-key python-mode-map (kbd "C-c C-S-c") 'py-execute-buffer-dedicated)
+  ;;(define-key python-mode-map (kbd "C-c C-S-c") 'py-execute-buffer-dedicated)
 #+END_SRC
 
 ** company
