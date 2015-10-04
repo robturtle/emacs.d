@@ -403,3 +403,23 @@ Use ace-jump to control the exact move of the cursor
   (global-set-key (kbd "C-;") 'ace-jump-mode)
   (global-set-key (kbd "C-:") 'ace-jump-char-mode)
 #+END_SRC
+* window management - smart-window =C-x w=
+
+| C-x w   | move         |
+| C-x W   | buffer split |
+| C-x M-w | file split   |
+| C-x R   | rotate       |
+| C-x 2   | below        |
+| C-x 3   | right        |
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  ;; apply the above functions
+  (require-package 'smart-window)
+  (require 'smart-window)
+  
+
+  ;; use shift-arrow to move through windows
+  (when (fboundp 'windmove-default-keybindings)
+    (windmove-default-keybindings))
+#+END_SRC
