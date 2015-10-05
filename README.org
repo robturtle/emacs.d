@@ -27,8 +27,12 @@ files.  Currently there are 3 levels:
 #+END_SRC
 
 The current progress of translating Steve Purcell's config is:
-** TODO [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [2/10]        :@network:ORG:
+** TODO [[http://pages.sachachua.com/.emacs.d/Sacha.html][Literate Programming Emacs Configuration]] [3/10]        :@network:ORG:
+   :PROPERTIES:
+   :ID:       CCBC9B82-F906-487F-8FE0-83B495BE608A
+   :END:
     :LOGBOOK:
+    CLOCK: [2015-09-28 Mon 17:59]--[2015-09-28 Mon 19:57] =>  1:58
     CLOCK: [2015-04-30 Thu 22:08]--[2015-04-30 Thu 22:09] =>  0:01
     CLOCK: [2015-04-30 Thu 22:07]--[2015-04-30 Thu 22:08] =>  0:01
     CLOCK: [2015-04-27 Mon 16:02]--[2015-04-27 Mon 16:04] =>  0:02
@@ -43,7 +47,7 @@ The current progress of translating Steve Purcell's config is:
      :PROPERTIES:
      :END:
     :PROPERTIES:
-    
+
     :END:
      :LOGBOOK:
      CLOCK: [2015-04-27 Mon 16:04]--[2015-04-27 Mon 16:47] =>  0:43
@@ -52,11 +56,13 @@ The current progress of translating Steve Purcell's config is:
      - [X] helper functions - utils
      - [X] package manager - elpa
      - [X] set up $PATH; for Windows Emacs - exec-path
-**** HOLD base packages [1/4]					       :HOLD:
+**** DONE base packages [2/2]
      :PROPERTIES:
+     :ID:       DB892FE2-96F0-456C-AA8F-71F8AC20DA72
      :END:
+     - State "DONE"       from "HOLD"       [2015-09-29 Tue 01:32]
     :PROPERTIES:
-    
+
     :END:
      - State "HOLD"       from "NEXT"       [2015-04-28 Tue 21:14] \\
        Some of these packages I don't think I ll use them currently.
@@ -64,17 +70,18 @@ The current progress of translating Steve Purcell's config is:
      :LOGBOOK:
      CLOCK: [2015-04-28 Tue 21:10]--[2015-04-28 Tue 21:15] =>  0:05
      :END:
-     - [ ] write grep command in a buffer - wgrep
-     - [ ] minor mode with no modeline display - dimnish
+     - write grep command in a buffer - wgrep
+     - [X] minor mode with no modeline display - dimnish
      - [X] mode-specific scratch buffers - scratch
-     - [ ] log keyboard commands to buffer - mwe-log-commands
+     - log keyboard commands to buffer - mwe-log-commands
 **** WAITING Load config for specific features & modes [3/25] 	    :WAITING:
      :PROPERTIES:
+     :ID:       376B1740-835C-4145-9151-CA5BFDC143F0
      :END:
      - State "WAITING"    from "NEXT"       [2015-04-30 Thu 23:57] \\
        wait for navigation
      :PROPERTIES:
-    
+
     :END:
      :LOGBOOK:
      CLOCK: [2015-04-28 Tue 21:40]--[2015-04-28 Tue 22:24] =>  0:44
@@ -86,9 +93,7 @@ The current progress of translating Steve Purcell's config is:
      - osx-keys - I've set the key binding system wide, so no need for this
      - [X] gui-frames
      - [ ] fonts
-     - [ ] evil --- should I install it?
-       - [ ] FIXME: powerline
-       - [ ] use c-p c-n in insert mode
+     - [X] FIXME: powerline
      - [ ] relative-line-numbers - obsolete - mode specific
      - [ ] proxies - obsolete
      - [ ] dired
@@ -109,16 +114,23 @@ The current progress of translating Steve Purcell's config is:
      - [ ] osx-location
      - [ ] regex-tool
      - [ ] server
-**** NEXT Text edit [0/5]
+**** NEXT Text edit [4/5]
      :PROPERTIES:
+     :ID:       3FB832DF-6726-49B8-8D40-D6EC936BC49E
+     :END:
+     :LOGBOOK:
+     CLOCK: [2015-09-16 Wed 18:51]--[2015-09-16 Wed 21:41] =>  2:50
+     CLOCK: [2015-09-14 Mon 14:02]--[2015-09-14 Mon 14:31] =>  0:29
+     CLOCK: [2015-09-12 Sat 00:51]--[2015-09-12 Sat 01:02] =>  0:11
      :END:
     :PROPERTIES:
-    
+
     :END:
-     - [ ] hippie-expand
-     - [ ] editing-utils
-     - [ ] *company*
-     - [ ] *yasnippet*
+     - hippie-expand
+     - [X] editing-utils
+     - [X] ace-jump
+     - [X] *company*
+     - [X] *yasnippet*
      - [ ] *doxymacs*
 **** DONE Navigation & Projects Management - bookmark+ now [6/6]
      :LOGBOOK:
@@ -140,18 +152,18 @@ The current progress of translating Steve Purcell's config is:
 ***** DONE *helm* [6/6]
 
       - State "WAITING"    from "NEXT"       [2015-04-30 Thu 23:55] \\
-	Waiting for bookmark+
+        Waiting for bookmark+
 ****** DONE FIXME: helm org tags
 ****** DONE *helm-projectile*
        :LOGBOOK:
        CLOCK: [2015-07-07 Tue 11:03]--[2015-07-07 Tue 11:04] =>  0:01
        :END:
 ******* DONE use bookmark+ to store virtual dired buffer
-	:LOGBOOK:
-	CLOCK: [2015-07-07 Tue 11:04]--[2015-07-07 Tue 11:31] =>  0:27
-	CLOCK: [2015-07-07 Tue 10:31]--[2015-07-07 Tue 11:03] =>  0:32
-	CLOCK: [2015-07-07 Tue 08:51]--[2015-07-07 Tue 10:22] =>  1:31
-	:END:
+        :LOGBOOK:
+        CLOCK: [2015-07-07 Tue 11:04]--[2015-07-07 Tue 11:31] =>  0:27
+        CLOCK: [2015-07-07 Tue 10:31]--[2015-07-07 Tue 11:03] =>  0:32
+        CLOCK: [2015-07-07 Tue 08:51]--[2015-07-07 Tue 10:22] =>  1:31
+        :END:
 ****** DONE eshell-history
        :LOGBOOK:
        CLOCK: [2015-07-09 Thu 10:49]--[2015-07-09 Thu 10:55] =>  0:06
@@ -170,9 +182,9 @@ The current progress of translating Steve Purcell's config is:
        :PROPERTIES:
        :Effort:   2:00
        :END:
-	:LOGBOOK:
-	CLOCK: [2015-04-29 Wed 10:34]--[2015-04-29 Wed 10:42] =>  0:08
-	:END:
+        :LOGBOOK:
+        CLOCK: [2015-04-29 Wed 10:34]--[2015-04-29 Wed 10:42] =>  0:08
+        :END:
       [2015-04-29 Wed 01:01]
 ***** DONE *projectile*
 ***** DONE *bookmark*
@@ -194,25 +206,27 @@ The current progress of translating Steve Purcell's config is:
       :LOGBOOK:
       CLOCK: [2015-07-09 Thu 11:53]--[2015-07-09 Thu 11:57] =>  0:04
       :END:
-**** TODO Sematics & Language Support [1/17]
+**** NEXT Sematics & Language Support [3/17]
      :PROPERTIES:
+     :ID:       143E295A-8EEC-4F90-9C51-049C8131B0F2
      :END:
      :LOGBOOK:
+     CLOCK: [2015-09-14 Mon 15:15]--[2015-09-14 Mon 18:14] =>  2:59
      CLOCK: [2015-07-02 Thu 15:51]--[2015-07-02 Thu 17:00] =>  1:09
      :END:
     :PROPERTIES:
-    
+
     :END:
      - [ ] semantic - should I install?
      - [ ] compile
-     - [ ] cc
+     - [X] cc
      - [ ] textile
      - [ ] markdown
      - [ ] csv
      - [ ] erlang
      - [ ] python - remember ipython notebooks
      - [X] haskell
-     - [ ] ruby
+     - [X] ruby
      - [ ] rails
      - [ ] R
      - [ ] paredit
@@ -222,9 +236,10 @@ The current progress of translating Steve Purcell's config is:
      - [ ] lua
 **** TODO Front-end languages [0/11]
      :PROPERTIES:
+     :ID:       C3338E3E-6CD3-47E3-B7EA-90B9D4E577BE
      :END:
     :PROPERTIES:
-    
+
     :END:
      - [ ] javascript
      - [ ] php
@@ -239,16 +254,18 @@ The current progress of translating Steve Purcell's config is:
      - [ ] dsvn
 **** TODO Documentation [0/1]
      :PROPERTIES:
+     :ID:       4676AECB-9F61-46A4-8D06-1FBFD199DC2F
      :END:
     :PROPERTIES:
-    
+
     :END:
      - [ ] dash
 **** TODO Misc [0/3]
      :PROPERTIES:
+     :ID:       2417433A-16E5-46BC-9D99-86B8AD2B5C30
      :END:
     :PROPERTIES:
-    
+
     :END:
      :LOGBOOK:
      CLOCK: [2015-04-29 Wed 11:07]--[2015-04-29 Wed 11:08] =>  0:01
@@ -258,17 +275,23 @@ The current progress of translating Steve Purcell's config is:
      - [ ] allow users to provide optional 'init-local' containting personal settings
      - [ ] locales (setting them earlier in this file doesn't work in X)
 **** NEXT [[file:~/.emacs.d][git push .emacs.d]]			:Git:
-     SCHEDULED: <2015-07-10 Fri .+1d/7d>
+     SCHEDULED: <2015-10-02 Fri ++7d>
      :PROPERTIES:
      :STYLE:    habit
      :REPEAT_TO_STATE: NEXT
-     :LAST_REPEAT: [2015-07-09 Thu 10:48]
+     :LAST_REPEAT: [2015-09-28 Mon 15:57]
+     :ID:       8471E12C-AC2B-4ACD-AF37-7F0EF296379D
      :END:
+     - State "DONE"       from "NEXT"       [2015-09-28 Mon 15:57]
+     - State "DONE"       from "NEXT"       [2015-09-19 Sat 08:52]
+     - State "DONE"       from "NEXT"       [2015-09-12 Sat 01:06]
+     - State "DONE"       from "NEXT"       [2015-09-12 Sat 01:06]
      - State "DONE"       from "NEXT"       [2015-07-09 Thu 10:48]
      - State "DONE"       from "NEXT"       [2015-07-03 Fri 17:10]
      - State "DONE"       from "NEXT"       [2015-06-17 Wed 20:05]
      - State "DONE"       from "NEXT"       [2015-04-29 Wed 23:42]
      :LOGBOOK:
+     CLOCK: [2015-09-19 Sat 00:45]--[2015-09-19 Sat 00:46] =>  0:01
      CLOCK: [2015-07-03 Fri 16:58]--[2015-07-03 Fri 17:10] =>  0:12
      CLOCK: [2015-06-17 Wed 19:59]--[2015-06-17 Wed 20:05] =>  0:06
      CLOCK: [2015-04-29 Wed 23:26]--[2015-04-29 Wed 23:42] =>  0:16
