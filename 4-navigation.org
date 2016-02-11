@@ -1,5 +1,20 @@
 #+TITLE: Navigation through resources
 
+* [[https://github.com/ralesi/ranger.el][Ranger]]
+Use ranger for file system management
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'ranger)
+  (setq ranger-override-dired t
+        ranger-cleanup-eagerly t
+        ranger-modify-header t
+        ranger-preview-file t
+        ranger-dont-show-binary t
+        ranger-show-literal t
+        )
+#+END_SRC
+
 * [[http://tuhdo.github.io/helm-intro.html][Helm]]
 =Helm= is a much more visualized navigation than =ido=.  It contains
 many functions and site-packages.  First of all, the base package is

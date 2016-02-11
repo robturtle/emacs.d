@@ -42,7 +42,7 @@
    tooltip-delay 1.5
    truncate-lines nil
    truncate-partial-width-windows nil
-   visible-bell t
+   visible-bell nil
    )
 
   (global-auto-revert-mode)
@@ -50,6 +50,25 @@
         auto-revert-verbose nil)
 
   (transient-mark-mode t)
+#+END_SRC
+
+* EVIL mode
+Evil mode is stripped from the config for a long time because the key confliction
+in many minor-modes. But it's still a very missing part of the editor.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'evil)
+  (require-package 'evil-leader)
+
+  (global-evil-leader-mode) ; should
+  (evil-mode 1)
+
+  (evil-leader/set-leader ",")
+
+  ;; e as explorer
+  (when (require 'ranger nil 'noerror)
+    (evil-leader/set-key "e" 'ranger))
 #+END_SRC
 
 * parenthesis =C-M-p/n/u=
@@ -184,34 +203,6 @@
   (global-set-key (kbd "C-=") 'er/expand-region)
 #+END_SRC
 
-* whole line or region
-If no region selected, run command on current line.
-#+header: :tangle yes
-#+BEGIN_SRC emacs-lisp
-  (require-package 'whole-line-or-region)
-  (whole-line-or-region-mode t)
-  (diminish 'whole-line-or-region-mode)
-  (make-variable-buffer-local 'whole-line-or-region-mode)
-
-  (defun suspend-mode-during-cua-rect-selection (mode-name)
-    "Add an advice to suspend `MODE-NAME' while selecting a CUA rectangle."
-    (let ((flagvar (intern (format "%s-was-active-before-cua-rectangle" mode-name)))
-          (advice-name (intern (format "suspend-%s" mode-name))))
-      (eval-after-load 'cua-rect
-        `(progn
-           (defvar ,flagvar nil)
-           (make-variable-buffer-local ',flagvar)
-           (defadvice cua--activate-rectangle (after ,advice-name activate)
-             (setq ,flagvar (and (boundp ',mode-name) ,mode-name))
-             (when ,flagvar
-               (,mode-name 0)))
-           (defadvice cua--deactivate-rectangle (after ,advice-name activate)
-             (when ,flagvar
-               (,mode-name 1)))))))
-
-  (suspend-mode-during-cua-rect-selection 'whole-line-or-region-mode)
-#+END_SRC
-
 * rectangle selection -- CUA =C-ENT=
 
 - enter to cycle through 4 corners
@@ -260,15 +251,6 @@ If no region selected, run command on current line.
   (diminish 'undo-tree-mode)
 #+END_SRC
 
-* Zap =M-z= kill till char =M-Z= kill up to char                      :NOTE:
-| M-z . | kill sentence |
-| M-z > | kill xml tag  |
-
-#+header: :tangle yes
-#+BEGIN_SRC emacs-lisp
-  (autoload 'zap-up-to-char "misc" "Kill up to, but not including ARGth occurrence of CHAR.")
-  (global-set-key (kbd "M-Z") 'zap-up-to-char)
-#+END_SRC
 * math symbol input
 
 #+header: :tangle yes
