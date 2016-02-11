@@ -403,3 +403,9 @@ FIXME: Currently it seems not work with flycheck, I'll fix it later.
 
   ;(add-to-list 'mmm-set-file-name-for-modes 'ruby-mode)
 #+END_SRC
+* Markdown
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'markdown-mode)
+  (add-auto-mode 'markdown-mode "\\.md\\'")
+#+END_SRC
