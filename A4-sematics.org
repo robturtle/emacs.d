@@ -53,3 +53,10 @@ I can't currently use this cause once I tangle it, it freeze my emacs.
   (define-key c-mode-map (kbd "C-c C-n") 'flycheck-tip-cycle)
   (define-key java-mode-map (kbd "C-c C-n") 'eclim-tip-cycle)
 #+END_SRC
+* Time Tracker
+Use this to monitor the time spending in the editor.
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'wakatime-mode)
+  (global-wakatime-mode 1)
+#+END_SRC
