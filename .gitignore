@@ -17,3 +17,5 @@ snippets/
 0-*.el
 0-*.org
 recentf
+.cask/
+/tramp
