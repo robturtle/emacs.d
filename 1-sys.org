@@ -548,3 +548,9 @@ Note that this function is /directory/ specified.
         (require-package 'frame-restore)
         (frame-restore)))
 #+END_SRC
+* Testing Framework - buttercup
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+  (require-package 'buttercup)
+#+END_SRC
