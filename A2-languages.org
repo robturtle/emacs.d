@@ -1,7 +1,8 @@
 #+title: Languages Support
 * C/C++ common
-Including CMake plugin and gdb settings.
 
+cmake-ide use CMake's info to build a tracking system, automatically
+configure the auto-completing system and syntax checker.
 #+header: :tangle yes
 #+BEGIN_SRC emacs-lisp
   ;;; CMake
@@ -10,20 +11,20 @@ Including CMake plugin and gdb settings.
   (require 'cmake-mode)
   (require 'cmake-font-lock)
 
-  (add-auto-mode 'cmake-mode "CMakeLists\\.txt\\'" "\\.cmake\\'")
+  (add-auto-mode 'cmake-mode "\\CMakeLists\\.txt\\'" "\\.cmake\\'")
 
-  (require-package 'cmake-project)
-  (require 'cmake-project)
+  (require-package 'cmake-ide)
+  (cmake-ide-setup)
 
   ;;; TODO enter cmake-project-mode only in CMake project
+#+END_SRC
 
-
-  
-  ;;; gdb
+make gdb debgging IDE-like
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
   (setq-default
    gdb-many-windows t
    gdb-show-main t)
-
 #+END_SRC
 
 ** indentation
