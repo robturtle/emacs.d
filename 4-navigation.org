@@ -12,6 +12,7 @@ Use ranger for file system management
         ranger-preview-file t
         ranger-dont-show-binary t
         ranger-show-literal t
+        ranger-show-dotfiles nil
         )
 #+END_SRC
 
